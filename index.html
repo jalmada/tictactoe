@@ -1,0 +1,152 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Canvas tutorial</title>
+    <script type="text/javascript">
+
+
+        Circle = function(x,y,radius){
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+            
+
+            this.paint = (function(ctx){
+                ctx.strokeStyle = "rgb(255,255,255)";
+                ctx.beginPath();
+                //ctx.moveTo(this.x + radius,this.y + radius);
+                ctx.arc(this.x + this.radius, this.y + this.radius, this.radius - 12, 0,Math.PI + (Math.PI * 2) / 2, true)
+                ctx.stroke();
+            }).bind(this);
+        }
+
+        Cross = function(x,y,width, height){
+            this.x = x + 12;
+            this.y = y + 12;
+            this.width = width -24;
+            this.height = height -24;
+
+            this.paint = (function(ctx){
+                ctx.strokeStyle = "rgb(255,255,255)";
+                ctx.lineWidth=10;
+                ctx.beginPath();
+                ctx.moveTo(this.x,this.y);
+                ctx.lineTo(this.x + this.width,this.y + this.height);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(this.x + this.width,this.y);
+                ctx.lineTo(this.x, this.y + this.height);
+                ctx.stroke();
+            }).bind(this);
+
+        }
+
+        Square = function(x,y,width,height){
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+
+            this.paint = (function(ctx){
+                ctx.fillStyle = `rgb(${this.x * 2}, ${this.y * 2}, ${this.width * 2})`;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }).bind(this);           
+
+            return {
+                paint: this.paint
+            }
+        }
+
+        Grid = function(x, y, width, height){
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+
+            this.squares = [];
+
+            this.paint = (function(ctx){
+                var swidth = Math.ceil(this.width / this.x);
+                var sheight = Math.ceil(this.height / this.y);
+
+                for(y = 0; y < this.height; y = y + sheight){
+                    for(x = 0; x < this.width; x = x + swidth){
+                        var s = new Square(x,y,swidth,sheight);
+                        this.squares.push(s);
+                        s.paint(ctx);
+                    }
+                }
+            }).bind(this);
+
+            return {
+                paint: this.paint
+            }
+        }
+
+
+        var canvas;
+        var ctx;
+
+        var xrownum;
+        var yrownum;
+        var gridWidth;
+        var gridHeight;
+
+        var crossesWidth;
+        var crossesHeight;
+        var circleRadius;
+
+        var currentShape;
+        var shapeLimit;
+
+        function draw() {
+            canvas = document.getElementById('tutorial');
+            if (canvas.getContext) {
+                ctx = canvas.getContext('2d');
+                xrownum = 3;
+                yrownum = 3;
+                shapeLimit = xrownum * yrownum;
+                gridWidth = 300;
+                gridHeight = 300;
+                currentShape = 1;
+
+                crossesWidth = Math.ceil(gridWidth / xrownum);
+                crossesHeight = Math.ceil(gridHeight / yrownum);
+                circleRadius = Math.ceil((gridWidth / xrownum)/2);
+
+                var grid = new Grid(xrownum,yrownum,gridWidth,gridHeight);
+                grid.paint(ctx);
+            }
+        }
+
+
+
+        function reset(){
+            draw();
+        }
+
+        function drawNextShape(){
+            if(currentShape == 1){
+                var cross = new Cross(0,0, crossesWidth, crossesHeight);
+                cross.paint(ctx);
+                currentShape = 0;
+            } else {
+                var circle = new Circle(crossesWidth, 0 , circleRadius);
+                circle.paint(ctx);
+                currentShape = 1;                
+            }
+        }
+
+    </script>
+    <style type="text/css">
+      canvas { border: 1px solid black; }
+    </style>
+  </head>
+  <body onload="draw();">
+    <canvas id="tutorial" width="300" height="300"></canvas><br/>
+    <button id="reset" onClick ="reset()">Reset</button>
+    <button id="next" onClick ="drawNextShape()">Next</button>
+    
+  </body>
+</html>
