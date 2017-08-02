@@ -49,21 +49,7 @@
 
         }
 
-        Square = function(x,y,width,height){
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-
-            this.paint = (function(ctx){
-                ctx.fillStyle = `rgb(${this.x * 2}, ${this.y * 2}, ${this.width * 2})`;
-                ctx.fillRect(this.x, this.y, this.width, this.height);
-            }).bind(this);           
-
-            return {
-                paint: this.paint
-            }
-        }
+     
 
         Mesh = function(cellsx, cellsy, width, height){
             this.cellsx = cellsx;
@@ -97,31 +83,7 @@
             }).bind(this);  
         }
 
-        Grid = function(x, y, width, height){
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-
-            this.squares = [];
-
-            this.paint = (function(ctx){
-                var swidth = Math.ceil(this.width / this.x);
-                var sheight = Math.ceil(this.height / this.y);
-
-                for(y = 0; y < this.height; y = y + sheight){
-                    for(x = 0; x < this.width; x = x + swidth){
-                        var s = new Square(x,y,swidth,sheight);
-                        this.squares.push(s);
-                        s.paint(ctx);
-                    }
-                }
-            }).bind(this);
-
-            return {
-                paint: this.paint
-            }
-        }
+       
 
         TicTacToe = function(canvasId, xcells, ycells){
 
@@ -212,6 +174,7 @@
 
             this.canvas.addEventListener('click', this.onCanvasClick, false);
             document.getElementById("reset").onclick = this.draw;
+            
             return {
                 draw: this.draw
             }
