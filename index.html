@@ -2,6 +2,14 @@
   <head>
     <meta charset="utf-8"/>
     <title>Canvas tutorial</title>
+    
+    <style type="text/css">
+      canvas { border: 1px solid black; }
+    </style>
+  </head>
+  <body onload="draw();">
+    <canvas id="tutorial" width="300" height="300"></canvas><br/>
+    <button id="reset" onClick ="reset()">Reset</button>
     <script type="text/javascript">
 
 
@@ -12,9 +20,8 @@
             
 
             this.paint = (function(ctx){
-                ctx.strokeStyle = "rgb(255,255,255)";
+                ctx.strokeStyle = "rgb(0,0,0)";
                 ctx.beginPath();
-                //ctx.moveTo(this.x + radius,this.y + radius);
                 ctx.arc(this.x + this.radius, this.y + this.radius, this.radius - 12, 0,Math.PI + (Math.PI * 2) / 2, true)
                 ctx.stroke();
             }).bind(this);
@@ -27,7 +34,7 @@
             this.height = height -24;
 
             this.paint = (function(ctx){
-                ctx.strokeStyle = "rgb(255,255,255)";
+                ctx.strokeStyle = "rgb(0,0,0)";
                 ctx.lineWidth=10;
                 ctx.beginPath();
                 ctx.moveTo(this.x,this.y);
@@ -56,6 +63,38 @@
             return {
                 paint: this.paint
             }
+        }
+
+        Mesh = function(cellsx, cellsy, width, height){
+            this.cellsx = cellsx;
+            this.cellsy = cellsy;
+            this.width = width;
+            this.height = height;
+
+            this.countVLines = cellsx - 1;
+            this.countHLines = cellsy - 1;
+            this.cellwidth = Math.ceil(width/cellsx);
+            this.cellheight = Math.ceil(height/cellsy);
+
+            this.paint = (function(ctx){
+                for(var x = 0, xpos = this.cellwidth; x < this.countVLines; x++, xpos = xpos + this.cellwidth){
+                    ctx.strokeStyle = "rgb(0,0,0)";
+                    ctx.lineWidth=5;
+                    ctx.beginPath();
+                    ctx.moveTo(xpos,0);
+                    ctx.lineTo(xpos, this.height);
+                    ctx.stroke();
+                }
+
+                for(var y = 0, ypos = this.cellheight; y < this.countHLines; y++, ypos = ypos + this.cellheight){
+                    ctx.strokeStyle = "rgb(0,0,0)";
+                    ctx.lineWidth=5;
+                    ctx.beginPath();
+                    ctx.moveTo(0,ypos);
+                    ctx.lineTo(this.width, ypos);
+                    ctx.stroke();
+                }           
+            }).bind(this);  
         }
 
         Grid = function(x, y, width, height){
@@ -100,12 +139,53 @@
         var currentShape;
         var shapeLimit;
 
-        function draw() {
+        var spaces = [];
+
+        function initCanvas(){
             canvas = document.getElementById('tutorial');
+            canvas.addEventListener('click', function(e) { 
+                var pos = getMousePos(canvas, e);
+
+                var w = crossesWidth;
+                var multiplierx = 0
+                while( w < pos.x){
+                    multiplierx++;
+                    w = w + crossesWidth;
+                }
+
+                var h = crossesHeight;
+                var multipliery = 0
+                while( h < pos.y){
+                    multipliery++;
+                    h = h + crossesHeight;
+                }
+
+                var placeX = multiplierx * crossesWidth;
+                var placeY = multipliery * crossesHeight;
+
+                if(!spaces[multiplierx][multipliery]){
+                    drawNextShape(placeX, placeY);
+                    spaces[multiplierx][multipliery] = true;
+                }
+            }, false);
+        }
+
+        function draw() {
             if (canvas.getContext) {
                 ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                spaces = [];
+                
+
                 xrownum = 3;
                 yrownum = 3;
+
+                for(var x = 0; x < xrownum; x++){
+                    spaces.push([]);
+                    for(var y = 0; y <yrownum; y++){
+                        spaces[x].push(false);
+                    }
+                }
                 shapeLimit = xrownum * yrownum;
                 gridWidth = 300;
                 gridHeight = 300;
@@ -115,38 +195,37 @@
                 crossesHeight = Math.ceil(gridHeight / yrownum);
                 circleRadius = Math.ceil((gridWidth / xrownum)/2);
 
-                var grid = new Grid(xrownum,yrownum,gridWidth,gridHeight);
-                grid.paint(ctx);
+                var mesh = new Mesh(xrownum,yrownum,gridWidth,gridHeight);
+                mesh.paint(ctx);
             }
         }
 
-
+        function getMousePos(canvas, evt) {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }        
 
         function reset(){
             draw();
         }
 
-        function drawNextShape(){
+        function drawNextShape(x,y){
             if(currentShape == 1){
-                var cross = new Cross(0,0, crossesWidth, crossesHeight);
+                var cross = new Cross(x,y, crossesWidth, crossesHeight);
                 cross.paint(ctx);
                 currentShape = 0;
             } else {
-                var circle = new Circle(crossesWidth, 0 , circleRadius);
+                var circle = new Circle(x, y , circleRadius);
                 circle.paint(ctx);
                 currentShape = 1;                
             }
         }
 
+        initCanvas();
+
     </script>
-    <style type="text/css">
-      canvas { border: 1px solid black; }
-    </style>
-  </head>
-  <body onload="draw();">
-    <canvas id="tutorial" width="300" height="300"></canvas><br/>
-    <button id="reset" onClick ="reset()">Reset</button>
-    <button id="next" onClick ="drawNextShape()">Next</button>
-    
   </body>
 </html>
