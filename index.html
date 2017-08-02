@@ -7,9 +7,9 @@
       canvas { border: 1px solid black; }
     </style>
   </head>
-  <body onload="draw();">
-    <canvas id="tutorial" width="300" height="300"></canvas><br/>
-    <button id="reset" onClick ="reset()">Reset</button>
+  <body>
+    <canvas id="tictactoe" width="300" height="300"></canvas><br/>
+    <button id="reset">Reset</button>
     <script type="text/javascript">
 
 
@@ -123,109 +123,102 @@
             }
         }
 
+        TicTacToe = function(canvasId, xcells, ycells){
 
-        var canvas;
-        var ctx;
+            this.canvasId = canvasId;
+            this.canvas = document.getElementById(this.canvasId);
 
-        var xrownum;
-        var yrownum;
-        var gridWidth;
-        var gridHeight;
+            this.ctx = this.canvas.getContext('2d');;
 
-        var crossesWidth;
-        var crossesHeight;
-        var circleRadius;
+            this.xcells = xcells;
+            this.ycells = ycells;
+            
+            this.elementWidth = Math.ceil(this.canvas.width / this.xcells);
+            this.elementHeight = Math.ceil(this.canvas.height / this.ycells);
+            this.elementRadius = Math.ceil((this.canvas.width / this.xcells)/2);
 
-        var currentShape;
-        var shapeLimit;
+            this.currentShape = 1;
+            this.shapeLimit = this.xcells * this.ycells;
 
-        var spaces = [];
+            this.spaces = [];
 
-        function initCanvas(){
-            canvas = document.getElementById('tutorial');
-            canvas.addEventListener('click', function(e) { 
-                var pos = getMousePos(canvas, e);
-
-                var w = crossesWidth;
-                var multiplierx = 0
-                while( w < pos.x){
-                    multiplierx++;
-                    w = w + crossesWidth;
+            this.getCellToUse = (function(v, q){
+                var i = q;
+                var p = 0
+                while( i < v){
+                    p++;
+                    i = i + q;
                 }
+                return p;
+            }).bind(this);
 
-                var h = crossesHeight;
-                var multipliery = 0
-                while( h < pos.y){
-                    multipliery++;
-                    h = h + crossesHeight;
+
+            this.onCanvasClick = (function(e){
+                var pos = this.getMousePos(e);
+
+                var cposx = this.getCellToUse(pos.x, this.elementWidth);
+                var cposy = this.getCellToUse(pos.y, this.elementHeight);
+
+                var placeX = cposx * this.elementWidth;
+                var placeY = cposy * this.elementHeight;
+
+                if(!this.spaces[cposx][cposy]){
+                    this.drawNextShape(placeX, placeY);
+                    this.spaces[cposx][cposy] = true;
                 }
+            }).bind(this);
 
-                var placeX = multiplierx * crossesWidth;
-                var placeY = multipliery * crossesHeight;
-
-                if(!spaces[multiplierx][multipliery]){
-                    drawNextShape(placeX, placeY);
-                    spaces[multiplierx][multipliery] = true;
-                }
-            }, false);
-        }
-
-        function draw() {
-            if (canvas.getContext) {
-                ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                spaces = [];
-                
-
-                xrownum = 3;
-                yrownum = 3;
-
-                for(var x = 0; x < xrownum; x++){
-                    spaces.push([]);
-                    for(var y = 0; y <yrownum; y++){
-                        spaces[x].push(false);
+            this.initSpaces = (function(){
+                this.spaces = [];
+                for(var x = 0; x < this.xcells; x++){
+                    this.spaces.push([]);
+                    for(var y = 0; y <this.ycells; y++){
+                        this.spaces[x].push(false);
                     }
                 }
-                shapeLimit = xrownum * yrownum;
-                gridWidth = 300;
-                gridHeight = 300;
-                currentShape = 1;
+            }).bind(this);
 
-                crossesWidth = Math.ceil(gridWidth / xrownum);
-                crossesHeight = Math.ceil(gridHeight / yrownum);
-                circleRadius = Math.ceil((gridWidth / xrownum)/2);
+            this.draw = (function() {
+                if (this.canvas.getContext) {
+                    
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.initSpaces();
+                    this.currentShape = 1;
 
-                var mesh = new Mesh(xrownum,yrownum,gridWidth,gridHeight);
-                mesh.paint(ctx);
-            }
-        }
+                    var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height);
+                    mesh.paint(this.ctx);
+                }
+            }).bind(this);
 
-        function getMousePos(canvas, evt) {
-            var rect = canvas.getBoundingClientRect();
+            this.getMousePos = (function(evt) {
+                var rect = this.canvas.getBoundingClientRect();
+                return {
+                    x: evt.clientX - rect.left,
+                    y: evt.clientY - rect.top
+                };
+            }).bind(this);        
+
+            this.drawNextShape = (function(x,y){
+                if(this.currentShape == 1){
+                    var cross = new Cross(x,y, this.elementWidth, this.elementHeight);
+                    cross.paint(this.ctx);
+                    this.currentShape = 0;
+                } else {
+                    var circle = new Circle(x, y , this.elementRadius);
+                    circle.paint(this.ctx);
+                    this.currentShape = 1;                
+                }
+            }).bind(this);
+
+            this.canvas.addEventListener('click', this.onCanvasClick, false);
+            document.getElementById("reset").onclick = this.draw;
             return {
-                x: evt.clientX - rect.left,
-                y: evt.clientY - rect.top
-            };
-        }        
-
-        function reset(){
-            draw();
-        }
-
-        function drawNextShape(x,y){
-            if(currentShape == 1){
-                var cross = new Cross(x,y, crossesWidth, crossesHeight);
-                cross.paint(ctx);
-                currentShape = 0;
-            } else {
-                var circle = new Circle(x, y , circleRadius);
-                circle.paint(ctx);
-                currentShape = 1;                
+                draw: this.draw
             }
-        }
+    }
 
-        initCanvas();
-
+    var ticTacToe = new TicTacToe("tictactoe", 3, 3);
+    ticTacToe.draw();
     </script>
   </body>
 </html>
