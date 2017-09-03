@@ -1,16 +1,30 @@
-    Circle = function(x,y,radius, lineWidth){
+    Circle = function(x,y,radiusx, radiusy, lineWidth){
         this.x = x;
         this.y = y;
-        this.radius = radius;
+        this.radiusx = radiusx;
+        this.radiusy = radiusy;
         this.lineWidth = lineWidth || 10;
         this.offset = this.lineWidth * 1.2;
-        
+        this.radiusOffsetx = this.radiusx - this.offset;
+        this.radiusOffsety = this.radiusy - this.offset;
 
         this.paint = (function(ctx){
             ctx.strokeStyle = "rgb(0,0,0)";
             ctx.lineWidth=this.lineWidth;
             ctx.beginPath();
-            ctx.arc(this.x + this.radius, this.y + this.radius, this.radius - this.offset, 0,Math.PI + (Math.PI * 2) / 2, true)
+
+            for (var i = 0; i < 2 * Math.PI; i += 0.01 ) {
+                xPos = this.x + this.radiusx - (this.radiusOffsetx * Math.cos(i));
+                yPos = this.y + this.radiusy + (this.radiusOffsety * Math.sin(i));
+            
+                if (i == 0) {
+                    ctx.moveTo(xPos, yPos);
+                } else {
+                    ctx.lineTo(xPos, yPos);
+                }
+            }
+
+            // ctx.arc(this.x + this.radius, this.y + this.radius, this.radius - this.offset, 0,2 * Math.PI , true)
             ctx.stroke();
         }).bind(this);
     }
@@ -85,13 +99,14 @@
             
             this.elementWidth = Math.ceil(this.canvas.width / this.xcells);
             this.elementHeight = Math.ceil(this.canvas.height / this.ycells);
-            this.elementRadius = Math.ceil((this.canvas.width / this.xcells)/2);
+            this.elementRadiusx = Math.ceil((this.canvas.width / this.xcells)/2);
+            this.elementRadiusy = Math.ceil((this.canvas.height / this.ycells)/2);
 
             this.currentShape = 1;
             this.shapeLimit = this.xcells * this.ycells;
             this.shapeCount = 0;
 
-            this.spaces = [];
+            this.board = [];
             this.lineWidth = ((this.canvas.width + this.canvas.height) / 2) * .02 ;
 
             this.getCellToUse = (function(v, q){
@@ -128,22 +143,38 @@
 
                 var cposx = this.getCellToUse(pos.x, this.elementWidth);
                 var cposy = this.getCellToUse(pos.y, this.elementHeight);
-
+                
                 var placeX = cposx * this.elementWidth;
                 var placeY = cposy * this.elementHeight;
 
-                if(!this.spaces[cposx][cposy]){
+                if(this.board[cposx][cposy] < 0){
+                    this.board[cposx][cposy] = this.currentShape;
                     this.drawNextShape(placeX, placeY);
-                    this.spaces[cposx][cposy] = true;
+                    this.currentShape = this.currentShape == 0 ? 1 : 0;
                 }
+                this.printConsoleBoard();
             }).bind(this);
 
-            this.initSpaces = (function(){
-                this.spaces = [];
+            this.printConsoleBoard = (function() {
+                var table = ''
+                for(var y = 0; y < this.ycells; y++){
+                    var row = "[";
+                    for(var x = 0; x < this.xcells; x++){
+                        row += this.board[x][y] + ",";
+                    }
+                    row += "]\n";
+                    table += row;
+                }
+                console.log(table);
+
+            }).bind(this);
+
+            this.initBoard = (function(){
+                this.board = [];
                 for(var x = 0; x < this.xcells; x++){
-                    this.spaces.push([]);
+                    this.board.push([]);
                     for(var y = 0; y <this.ycells; y++){
-                        this.spaces[x].push(false);
+                        this.board[x].push(-1);
                     }
                 }
             }).bind(this);
@@ -152,7 +183,7 @@
                 if (this.canvas.getContext) {
                     
                     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                    this.initSpaces();
+                    this.initBoard();
                     this.currentShape = 1;
                     this.shapeCount = 0;
 
@@ -174,11 +205,9 @@
                 if(this.currentShape == 1){
                     var cross = new Cross(x,y, this.elementWidth, this.elementHeight, this.lineWidth);
                     cross.paint(this.ctx);
-                    this.currentShape = 0;
                 } else {
-                    var circle = new Circle(x, y , this.elementRadius, this.lineWidth);
-                    circle.paint(this.ctx);
-                    this.currentShape = 1;                
+                    var circle = new Circle(x, y , this.elementRadiusx, this.elementRadiusy, this.lineWidth);
+                    circle.paint(this.ctx);             
                 }
                 this.shapeCount++;
             }).bind(this);
@@ -190,6 +219,8 @@
             this.canvas.addEventListener('click', this.onCanvasClick, false);
             document.getElementById("reset").onclick = this.reset;
             
+           
+
             return {
                 draw: this.draw
             }
