@@ -170,8 +170,12 @@ var TicTacToe = function () {
 
             var pos = this.getMousePos(e);
 
-            var cposx = this.getCellToUse(pos.x, this.elementWidth);
-            var cposy = this.getCellToUse(pos.y, this.elementHeight);
+            var getCoord = function getCoord(pos, size) {
+                return Math.floor(pos / size);
+            };
+
+            var cposx = getCoord(pos.x, this.elementWidth);
+            var cposy = getCoord(pos.y, this.elementHeight);
 
             var placeX = cposx * this.elementWidth;
             var placeY = cposy * this.elementHeight;
