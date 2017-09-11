@@ -2,6 +2,7 @@
     import Circle from './circle.js';
     import Cross from './cross.js';
     import Mesh from './mesh.js';
+    import _ from 'lodash';
 
     class TicTacToe {
         constructor(canvasId, xcells, ycells){
@@ -24,6 +25,7 @@
             this.shapeCount = 0;
 
             this.board = [];
+            this.winningLines = _.times(this.xcells + this.ycells + 2, _.constant(0));
             this.lineWidth = ((this.canvas.width + this.canvas.height) / 2) * .02 ;
 
             this.canvas.addEventListener('click', this.onCanvasClick.bind(this), false);
@@ -51,7 +53,7 @@
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 this.ctx.font = "30px Arial";
                 this.ctx.textAlign="center"; 
-                this.ctx.fillText("Game Over",this.canvas.width/2,(this.canvas.height/2)-15);
+                this.ctx.fillText("Draw",this.canvas.width/2,(this.canvas.height/2)-15);
                 this.ctx.font = "15px Arial";                    
                 this.ctx.fillText("Click to try Again",this.canvas.width/2,(this.canvas.height/2)+5);
 
@@ -72,8 +74,24 @@
             if(this.board[cposx][cposy] < 0){
                 this.board[cposx][cposy] = this.currentShape;
                 this.drawNextShape(placeX, placeY);
+                let winner = this.getWinner(cposx, cposy)
+                console.log(this.winningLines);
+                if(winner > -1){
+
+                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    this.ctx.font = "30px Arial";
+                    this.ctx.textAlign="center"; 
+                    this.ctx.fillText(`${this.currentShape == 0 ? "Circle" : "Cross"} Won`,this.canvas.width/2,(this.canvas.height/2)-15);
+                    this.ctx.font = "15px Arial";                    
+                    this.ctx.fillText("Click to try Again",this.canvas.width/2,(this.canvas.height/2)+5);
+    
+                    this.shapeCount = this.shapeLimit + 1;
+                    
+                }
+
                 this.currentShape = this.currentShape == 0 ? 1 : 0;
             }
+            
             this.printConsoleBoard();
         }
 
@@ -99,6 +117,7 @@
                     this.board[x].push(-1);
                 }
             }
+            this.winningLines = _.times(this.xcells + this.ycells + 2, _.constant(0));
         }
 
         draw() {
@@ -108,6 +127,7 @@
                 this.initBoard();
                 this.currentShape = 1;
                 this.shapeCount = 0;
+                
 
                 var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height, this.lineWidth / 2);
                 mesh.paint(this.ctx);
@@ -136,6 +156,30 @@
 
         reset(){
             this.draw();
+        }
+
+        getWinner(x, y){
+            let valToSave = this.currentShape == 0 ? -1 : 1;
+
+            this.winningLines[x] += valToSave;
+            if(Math.abs(this.winningLines[x]) == this.xcells) return this.currentShape;
+
+            this.winningLines[y + this.xcells] += valToSave;
+            if(Math.abs(this.winningLines[y + this.xcells ]) == this.ycells) return this.currentShape;
+
+            let lowestCoord = Math.min(this.xcells, this.ycells);
+            if(x == y) {
+                this.winningLines[this.xcells + this.ycells] += valToSave;
+                if(Math.abs(this.winningLines[this.xcells + this.ycells]) == lowestCoord) return this.currentShape;
+            }
+
+            if(x + y == lowestCoord - 1) {
+                this.winningLines[this.xcells + this.ycells + 1] += valToSave;
+                if(Math.abs(this.winningLines[this.xcells + this.ycells + 1]) == lowestCoord) return this.currentShape;
+            }
+
+            return -1;
+
         }
     }
 
