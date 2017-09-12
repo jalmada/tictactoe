@@ -142,10 +142,10 @@
             let valToSave = this.currentShape == 0 ? -1 : 1;
 
             this.winningLines[x] += valToSave;
-            if(Math.abs(this.winningLines[x]) == this.xcells) return this.currentShape;
+            if(Math.abs(this.winningLines[x]) == this.ycells) return this.currentShape;
 
             this.winningLines[y + this.xcells] += valToSave;
-            if(Math.abs(this.winningLines[y + this.xcells ]) == this.ycells) return this.currentShape;
+            if(Math.abs(this.winningLines[y + this.xcells ]) == this.xcells) return this.currentShape;
 
             let lowestCoord = Math.min(this.xcells, this.ycells);
             if(x == y) {
