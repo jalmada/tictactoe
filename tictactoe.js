@@ -2,6 +2,7 @@
     import Circle from './circle.js';
     import Cross from './cross.js';
     import Mesh from './mesh.js';
+    import Message from './message.js';
     import _ from 'lodash';
 
     class TicTacToe {
@@ -28,36 +29,15 @@
             this.winningLines = _.times(this.xcells + this.ycells + 2, _.constant(0));
             this.lineWidth = ((this.canvas.width + this.canvas.height) / 2) * .02 ;
 
+            this.message = new Message(this.canvas.width, this.canvas.height);
+
             this.canvas.addEventListener('click', this.onCanvasClick.bind(this), false);
             document.getElementById("reset").onclick = this.reset.bind(this);
-        }
-
-        getCellToUse(v, q){
-            var i = q;
-            var p = 0
-            while( i < v){
-                p++;
-                i = i + q;
-            }
-            return p;
         }
 
         onCanvasClick(e){
             if(this.shapeCount > this.shapeLimit){
                 this.reset();
-                return;
-            }
-
-            if(this.shapeCount == this.shapeLimit){
-
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.ctx.font = "30px Arial";
-                this.ctx.textAlign="center"; 
-                this.ctx.fillText("Draw",this.canvas.width/2,(this.canvas.height/2)-15);
-                this.ctx.font = "15px Arial";                    
-                this.ctx.fillText("Click to try Again",this.canvas.width/2,(this.canvas.height/2)+5);
-
-                this.shapeCount++;
                 return;
             }
 
@@ -72,21 +52,22 @@
             var placeY = cposy * this.elementHeight;
 
             if(this.board[cposx][cposy] < 0){
+                
                 this.board[cposx][cposy] = this.currentShape;
+
                 this.drawNextShape(placeX, placeY);
+                this.shapeCount++;
+
                 let winner = this.getWinner(cposx, cposy)
-                console.log(this.winningLines);
+  
                 if(winner > -1){
 
-                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                    this.ctx.font = "30px Arial";
-                    this.ctx.textAlign="center"; 
-                    this.ctx.fillText(`${this.currentShape == 0 ? "Circle" : "Cross"} Won`,this.canvas.width/2,(this.canvas.height/2)-15);
-                    this.ctx.font = "15px Arial";                    
-                    this.ctx.fillText("Click to try Again",this.canvas.width/2,(this.canvas.height/2)+5);
-    
+                    this.message.paint(this.ctx, `${this.currentShape == 0 ? "Circle" : "Cross"} Won`, 'Click to try Again');    
                     this.shapeCount = this.shapeLimit + 1;
-                    
+                } else if (this.shapeCount == this.shapeLimit){
+                    this.message.paint(this.ctx, 'Draw', 'Click to Try Again');
+                    this.shapeCount++;
+                    return;
                 }
 
                 this.currentShape = this.currentShape == 0 ? 1 : 0;
@@ -151,7 +132,6 @@
                 var circle = new Circle(x, y , this.elementRadiusx, this.elementRadiusy, this.lineWidth);
                 circle.paint(this.ctx);             
             }
-            this.shapeCount++;
         }
 
         reset(){
