@@ -110,12 +110,7 @@
                 }
             }
 
-<<<<<<< HEAD:tictactoe.js
-
-            this.winningLines = _.times(this.xcells + this.ycells + this.diagonalAmount, _.constant(0));
-=======
             this.winningLines = _.times(this.xcells + this.ycells + (this.diagonalLines * 2), _.constant(0));
->>>>>>> 81d0e391772d153adc7223cf512648cec6c835ff:tictactoepro.js
             this.currentShape = 1;
             this.shapeCount = 0;
         }

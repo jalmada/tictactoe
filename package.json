@@ -8,7 +8,7 @@
     "juego",
     "game"
   ],
-  "main": "tictactoepro.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "./node_modules/.bin/webpack",
