@@ -5,7 +5,7 @@
     import Message from './message.js';
     import _ from 'lodash';
 
-    class TicTacToe {
+    class TicTacToePro {
         constructor(canvasId, xcells, ycells){
 
             this.canvasId = canvasId;
@@ -29,10 +29,22 @@
 
 
             this.canvas.addEventListener('click', this.onCanvasClick.bind(this), false);
-            document.getElementById("reset").onclick = this.reset.bind(this);
+            this.addResetButton();
             this.initBoard();            
         }
 
+        addResetButton(){
+            let resetButton = document.createElement('button');
+            resetButton.id = 'reset';
+            resetButton.innerHTML = 'Reset';
+            resetButton.onclick = this.reset.bind(this);
+
+            let br = document.createElement('br');
+
+            this.canvas.parentNode.insertBefore(br, this.canvas.nextSibling);
+            br.parentNode.insertBefore(resetButton, br.nextSibling);
+        }
+    
         onCanvasClick(e){
             if(this.shapeCount > this.shapeLimit){
                 this.reset();
@@ -83,8 +95,8 @@
                 row += "]\n";
                 table += row;
             }
-            //console.log(table);
 
+            console.log(table);
         }
 
         initBoard(){
@@ -95,8 +107,6 @@
                     this.board[x].push(0);
                 }
             }
-
-
 
             this.winningLines = _.times(this.xcells + this.ycells + (this.diagonalLines * 2), _.constant(0));
             this.currentShape = 1;
@@ -139,7 +149,6 @@
 
         getWinner(x, y){
 
-
             this.winningLines[x] += this.currentShape;
             if(Math.abs(this.winningLines[x]) == this.ycells) return this.currentShape;
 
@@ -151,8 +160,6 @@
             let initialDownTopDiagIndex = initialTopDownDiagIndex + this.diagonalLines;
 
             for(let dn = 0; dn < this.diagonalLines; dn++){
-
-                //when lowest is x then add to y and viceversa
                 if(this.xcells <= this.ycells){
                     if(x - (y - dn) == 0){
                         this.winningLines[initialTopDownDiagIndex + dn] += this.currentShape;
@@ -174,22 +181,10 @@
                         if(Math.abs(this.winningLines[initialDownTopDiagIndex + dn]) == lowestCoord) return this.currentShape;
                     }
                 }
-
-        
- 
-                //console.log(`${tx}(tx) == ${y}(y) - ${dn}(dn) || ${x}(x) - ${dn}(dn) == ${ty}(ty)`);
-
-                
-
-                //console.log(`(${tx}(tx) + (${y}(y) - ${dn}(dn))== ${lowestCoord}(lowestCoord) - 1) || ((${x}(x) - ${dn}(dn)) + ${ty}(ty) == ${lowestCoord}(lowestCoord) - 1)`);
-
-               
-
-                console.log(this.winningLines);
             }
             return 0;
 
         }
     }
 
-    export default TicTacToe;
+    export default TicTacToePro;
