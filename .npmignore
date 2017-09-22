@@ -5,3 +5,4 @@ style.css
 dist/**
 /node_modules/**
 /npm-debug.log.*
+.vscode/**
