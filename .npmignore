@@ -1,0 +1,7 @@
+index.html
+.gitignore
+index.js
+style.css
+dist/**
+/node_modules/**
+/npm-debug.log.*
