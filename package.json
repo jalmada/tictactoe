@@ -2,7 +2,13 @@
   "name": "tictactoepro",
   "version": "1.0.0",
   "description": "Tic Tac Toe for the masses!",
-  "main": "index.js",
+  "keywords": [
+    "tictactoe",
+    "gato",
+    "juego",
+    "game"
+  ],
+  "main": "tictactoepro.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "./node_modules/.bin/webpack",
@@ -13,7 +19,7 @@
     "type": "git",
     "url": "git+https://github.com/jalmada/tictactoe.git"
   },
-  "author": "Jose Almada",
+  "author": "Jose Almada <jalmada.e@gmail.com> (http://jalmada.me",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/jalmada/tictactoe/issues"

@@ -5,7 +5,7 @@
     import Message from './message.js';
     import _ from 'lodash';
 
-    class TicTacToe {
+    class TicTacToePro {
         constructor(canvasId, xcells, ycells){
 
             this.canvasId = canvasId;
@@ -27,12 +27,26 @@
             this.lineWidth = ((this.canvas.width + this.canvas.height) / 2) * .02 ;
 
             this.message = new Message(this.canvas.width, this.canvas.height);
+            this.diagonalLines = Math.abs(this.xcells - this.ycells) + 1;
+
 
             this.canvas.addEventListener('click', this.onCanvasClick.bind(this), false);
-            document.getElementById("reset").onclick = this.reset.bind(this);
+            this.addResetButton();
             this.initBoard();            
         }
 
+        addResetButton(){
+            let resetButton = document.createElement('button');
+            resetButton.id = 'reset';
+            resetButton.innerHTML = 'Reset';
+            resetButton.onclick = this.reset.bind(this);
+
+            let br = document.createElement('br');
+
+            this.canvas.parentNode.insertBefore(br, this.canvas.nextSibling);
+            br.parentNode.insertBefore(resetButton, br.nextSibling);
+        }
+    
         onCanvasClick(e){
             if(this.shapeCount > this.shapeLimit){
                 this.reset();
@@ -83,8 +97,8 @@
                 row += "]\n";
                 table += row;
             }
-            console.log(table);
 
+            console.log(table);
         }
 
         initBoard(){
@@ -96,8 +110,12 @@
                 }
             }
 
+<<<<<<< HEAD:tictactoe.js
 
             this.winningLines = _.times(this.xcells + this.ycells + this.diagonalAmount, _.constant(0));
+=======
+            this.winningLines = _.times(this.xcells + this.ycells + (this.diagonalLines * 2), _.constant(0));
+>>>>>>> 81d0e391772d153adc7223cf512648cec6c835ff:tictactoepro.js
             this.currentShape = 1;
             this.shapeCount = 0;
         }
@@ -138,27 +156,42 @@
 
         getWinner(x, y){
 
-
             this.winningLines[x] += this.currentShape;
             if(Math.abs(this.winningLines[x]) == this.ycells) return this.currentShape;
 
             this.winningLines[y + this.xcells] += this.currentShape;
             if(Math.abs(this.winningLines[y + this.xcells ]) == this.xcells) return this.currentShape;
 
-            let lowestCoord = Math.min(this.xcells, this.ycells);
-            if(x == y) {
-                this.winningLines[this.xcells + this.ycells] += this.currentShape;
-                if(Math.abs(this.winningLines[this.xcells + this.ycells]) == lowestCoord) return this.currentShape;
-            }
+            let lowestCoord = Math.min(this.xcells, this.ycells);   
+            let initialTopDownDiagIndex = this.xcells + this.ycells;
+            let initialDownTopDiagIndex = initialTopDownDiagIndex + this.diagonalLines;
 
-            if(x + y == lowestCoord - 1) {
-                this.winningLines[this.xcells + this.ycells + 1] += this.currentShape;
-                if(Math.abs(this.winningLines[this.xcells + this.ycells + 1]) == lowestCoord) return this.currentShape;
-            }
+            for(let dn = 0; dn < this.diagonalLines; dn++){
+                if(this.xcells <= this.ycells){
+                    if(x - (y - dn) == 0){
+                        this.winningLines[initialTopDownDiagIndex + dn] += this.currentShape;
+                        if(Math.abs(this.winningLines[initialTopDownDiagIndex + dn]) == lowestCoord) return this.currentShape;
+                    }
 
+                    if((x + (y - dn)) == lowestCoord - 1){
+                        this.winningLines[initialDownTopDiagIndex + dn] += this.currentShape;
+                        if(Math.abs(this.winningLines[initialDownTopDiagIndex + dn]) == lowestCoord) return this.currentShape;
+                    }
+                } else {
+                    if(y - (x - dn) == 0){
+                        this.winningLines[initialTopDownDiagIndex + dn] += this.currentShape;
+                        if(Math.abs(this.winningLines[initialTopDownDiagIndex + dn]) == lowestCoord) return this.currentShape;
+                    } 
+
+                    if((y + (x - dn)) == lowestCoord - 1){
+                        this.winningLines[initialDownTopDiagIndex + dn] += this.currentShape;
+                        if(Math.abs(this.winningLines[initialDownTopDiagIndex + dn]) == lowestCoord) return this.currentShape;
+                    }
+                }
+            }
             return 0;
 
         }
     }
 
-    export default TicTacToe;
+    export default TicTacToePro;
