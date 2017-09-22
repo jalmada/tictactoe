@@ -21,6 +21,8 @@
             this.elementRadiusx = Math.ceil((this.canvas.width / this.xcells)/2);
             this.elementRadiusy = Math.ceil((this.canvas.height / this.ycells)/2);
 
+            this.diagonalAmount = (Math.abs(this.xcells - this.ycells) + 1) * 2;
+
             this.shapeLimit = this.xcells * this.ycells;
             this.lineWidth = ((this.canvas.width + this.canvas.height) / 2) * .02 ;
 
@@ -94,7 +96,8 @@
                 }
             }
 
-            this.winningLines = _.times(this.xcells + this.ycells + 2, _.constant(0));
+
+            this.winningLines = _.times(this.xcells + this.ycells + this.diagonalAmount, _.constant(0));
             this.currentShape = 1;
             this.shapeCount = 0;
         }
