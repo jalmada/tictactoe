@@ -15,18 +15,28 @@
     "watch": "./node_modules/.bin/webpack --watch",
     "start": "webpack-dev-server"
   },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jalmada/tictactoe.git"
   },
-  "author": "Jose Almada <jalmada.e@gmail.com> (http://jalmada.me",
+  "author": "Jose Almada <jalmada.e@gmail.com> (http://jalmada.me)",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/jalmada/tictactoe/issues"
   },
   "homepage": "https://github.com/jalmada/tictactoe#readme",
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
     "css-loader": "^0.28.7",
     "file-loader": "^0.11.2",
     "html-webpack-plugin": "^2.30.1",

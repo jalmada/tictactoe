@@ -12,14 +12,21 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'index.js'
-  },
+    },
   module: {
-    loaders: [
-      { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
-      { test: /\.jsx$/, loader: 'babel-loader', exclude: /node_modules/ }
-    ],
+    
     rules: [
-      { test: /\.css$/, use: ['style-loader','css-loader'] } 
+      { test: /\.css$/, use: ['style-loader','css-loader'] },
+      {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['env']
+          }
+        }
+      } 
     ]
   },
   plugins: [HtmlWebpackPluginConfig]
