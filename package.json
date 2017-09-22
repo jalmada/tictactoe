@@ -1,6 +1,6 @@
 {
   "name": "tictactoepro",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Tic Tac Toe for the masses!",
   "keywords": [
     "tictactoe",
@@ -8,10 +8,10 @@
     "juego",
     "game"
   ],
-  "main": "index.js",
+  "main": "tictactoepro.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./node_modules/.bin/webpack",
+    "build": "./node_modules/.bin/webpack --config ./webpack.config.js",
     "watch": "./node_modules/.bin/webpack --watch",
     "start": "webpack-dev-server"
   },

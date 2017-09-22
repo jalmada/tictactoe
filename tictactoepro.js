@@ -1,4 +1,3 @@
-    
     import Circle from './circle.js';
     import Cross from './cross.js';
     import Mesh from './mesh.js';
