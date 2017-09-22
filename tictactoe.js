@@ -25,6 +25,8 @@
             this.lineWidth = ((this.canvas.width + this.canvas.height) / 2) * .02 ;
 
             this.message = new Message(this.canvas.width, this.canvas.height);
+            this.diagonalLines = Math.abs(this.xcells - this.ycells) + 1;
+
 
             this.canvas.addEventListener('click', this.onCanvasClick.bind(this), false);
             document.getElementById("reset").onclick = this.reset.bind(this);
@@ -81,7 +83,7 @@
                 row += "]\n";
                 table += row;
             }
-            console.log(table);
+            //console.log(table);
 
         }
 
@@ -94,7 +96,9 @@
                 }
             }
 
-            this.winningLines = _.times(this.xcells + this.ycells + 2, _.constant(0));
+
+
+            this.winningLines = _.times(this.xcells + this.ycells + (this.diagonalLines * 2), _.constant(0));
             this.currentShape = 1;
             this.shapeCount = 0;
         }
@@ -142,17 +146,47 @@
             this.winningLines[y + this.xcells] += this.currentShape;
             if(Math.abs(this.winningLines[y + this.xcells ]) == this.xcells) return this.currentShape;
 
-            let lowestCoord = Math.min(this.xcells, this.ycells);
-            if(x == y) {
-                this.winningLines[this.xcells + this.ycells] += this.currentShape;
-                if(Math.abs(this.winningLines[this.xcells + this.ycells]) == lowestCoord) return this.currentShape;
-            }
+            let lowestCoord = Math.min(this.xcells, this.ycells);   
+            let initialTopDownDiagIndex = this.xcells + this.ycells;
+            let initialDownTopDiagIndex = initialTopDownDiagIndex + this.diagonalLines;
 
-            if(x + y == lowestCoord - 1) {
-                this.winningLines[this.xcells + this.ycells + 1] += this.currentShape;
-                if(Math.abs(this.winningLines[this.xcells + this.ycells + 1]) == lowestCoord) return this.currentShape;
-            }
+            for(let dn = 0; dn < this.diagonalLines; dn++){
 
+                //when lowest is x then add to y and viceversa
+                if(this.xcells <= this.ycells){
+                    if(x - (y - dn) == 0){
+                        this.winningLines[initialTopDownDiagIndex + dn] += this.currentShape;
+                        if(Math.abs(this.winningLines[initialTopDownDiagIndex + dn]) == lowestCoord) return this.currentShape;
+                    }
+
+                    if((x + (y - dn)) == lowestCoord - 1){
+                        this.winningLines[initialDownTopDiagIndex + dn] += this.currentShape;
+                        if(Math.abs(this.winningLines[initialDownTopDiagIndex + dn]) == lowestCoord) return this.currentShape;
+                    }
+                } else {
+                    if(y - (x - dn) == 0){
+                        this.winningLines[initialTopDownDiagIndex + dn] += this.currentShape;
+                        if(Math.abs(this.winningLines[initialTopDownDiagIndex + dn]) == lowestCoord) return this.currentShape;
+                    } 
+
+                    if((y + (x - dn)) == lowestCoord - 1){
+                        this.winningLines[initialDownTopDiagIndex + dn] += this.currentShape;
+                        if(Math.abs(this.winningLines[initialDownTopDiagIndex + dn]) == lowestCoord) return this.currentShape;
+                    }
+                }
+
+        
+ 
+                //console.log(`${tx}(tx) == ${y}(y) - ${dn}(dn) || ${x}(x) - ${dn}(dn) == ${ty}(ty)`);
+
+                
+
+                //console.log(`(${tx}(tx) + (${y}(y) - ${dn}(dn))== ${lowestCoord}(lowestCoord) - 1) || ((${x}(x) - ${dn}(dn)) + ${ty}(ty) == ${lowestCoord}(lowestCoord) - 1)`);
+
+               
+
+                console.log(this.winningLines);
+            }
             return 0;
 
         }
