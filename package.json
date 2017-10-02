@@ -15,11 +15,6 @@
     "watch": "./node_modules/.bin/webpack --watch",
     "start": "webpack-dev-server"
   },
-  "babel": {
-    "presets": [
-      "es2015"
-    ]
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jalmada/tictactoe.git"
@@ -44,5 +39,8 @@
     "style-loader": "^0.18.2",
     "webpack": "^3.5.6",
     "webpack-dev-server": "^2.7.1"
+  },
+  "dependencies": {
+    "jquery": "^3.2.1"
   }
 }

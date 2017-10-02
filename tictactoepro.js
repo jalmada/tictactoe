@@ -2,6 +2,8 @@
     import Cross from './cross.js';
     import Mesh from './mesh.js';
     import Message from './message.js';
+    import Utils from './utils.js';
+    import Enums from './enums.js';
     import _ from 'lodash';
 
     class TicTacToePro {
@@ -10,7 +12,7 @@
             this.canvasId = canvasId;
             this.canvas = document.getElementById(this.canvasId);
 
-            this.ctx = this.canvas.getContext('2d');;
+            this.ctx = this.canvas.getContext('2d');
 
             this.xcells = xcells;
             this.ycells = ycells;
@@ -29,126 +31,69 @@
             this.diagonalLines = Math.abs(this.xcells - this.ycells) + 1;
 
 
-            this.canvas.addEventListener('click', this.onCanvasClick.bind(this), false);
-            this.addResetButton();
-            this.initBoard();            
+            this.canvas.addEventListener('click', this._onTurn.bind(this), false);
+            this._initBoard();            
         }
 
-        addResetButton(){
-            let resetButton = document.createElement('button');
-            resetButton.id = 'reset';
-            resetButton.innerHTML = 'Reset';
-            resetButton.onclick = this.reset.bind(this);
-
-            let br = document.createElement('br');
-
-            this.canvas.parentNode.insertBefore(br, this.canvas.nextSibling);
-            br.parentNode.insertBefore(resetButton, br.nextSibling);
-        }
-    
-        onCanvasClick(e){
+        _onTurn(e){
             if(this.shapeCount > this.shapeLimit){
                 this.reset();
                 return;
             }
 
-            var pos = this.getMousePos(e);
+            let pos = Utils._getMousePos(e, this.canvas);
+            let x = Math.floor(pos.x/ this.elementWidth);
+            let y = Math.floor(pos.y/ this.elementHeight);
 
-            let getCoord = (pos, size) => Math.floor(pos/ size);
+            if (this.board[x][y] != 0) return;
 
-            var cposx = getCoord(pos.x, this.elementWidth);
-            var cposy = getCoord(pos.y, this.elementHeight);
-            
-            var placeX = cposx * this.elementWidth;
-            var placeY = cposy * this.elementHeight;
+            this.board[x][y] = this.currentShape;
+            this.drawShape(x, y, this.currentShape);
+            this.shapeCount++;
 
-            if(this.board[cposx][cposy] == 0){
-                
-                this.board[cposx][cposy] = this.currentShape;
+            let winner = this._getWinner(x, y);
+            if(winner) this._printWinnerMessage();
 
-                this.drawNextShape(placeX, placeY);
-                this.shapeCount++;
-
-                let winner = this.getWinner(cposx, cposy)
-  
-                if(winner != 0){
-                    this.message.paint(this.ctx, `${this.currentShape == -1 ? "Circle" : "Cross"} Won`, 'Click to try Again');    
-                    this.shapeCount = this.shapeLimit + 1;
-                } else if (this.shapeCount == this.shapeLimit){
-                    this.message.paint(this.ctx, 'Draw', 'Click to Try Again');
-                    this.shapeCount++;
-                    return;
-                }
-
-                this.currentShape = this.currentShape == -1 ? 1 : -1;
-            }
-            
-            this.printConsoleBoard();
+            this.currentShape = this.currentShape == -1 ? 1 : -1;
         }
 
-        printConsoleBoard() {
-            var table = ''
-            for(var y = 0; y < this.ycells; y++){
-                var row = "[";
-                for(var x = 0; x < this.xcells; x++){
-                    row += this.board[x][y] + ",";
-                }
-                row += "]\n";
-                table += row;
-            }
-
-            console.log(table);
-        }
-
-        initBoard(){
-            this.board = [];
-            for(var x = 0; x < this.xcells; x++){
-                this.board.push([]);
-                for(var y = 0; y <this.ycells; y++){
-                    this.board[x].push(0);
-                }
-            }
-
-            this.winningLines = _.times(this.xcells + this.ycells + (this.diagonalLines * 2), _.constant(0));
-            this.currentShape = 1;
-            this.shapeCount = 0;
-        }
-
+        //draw the initial board
         draw() {
             if (this.canvas.getContext) {
                 
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.initBoard();
+                this._initBoard();
 
                 var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height, this.lineWidth / 2);
                 mesh.paint(this.ctx);
             }
         }
 
-        getMousePos(evt) {
-            var rect = this.canvas.getBoundingClientRect();
-            return {
-                x: evt.clientX - rect.left,
-                y: evt.clientY - rect.top
-            };
-        }       
-
-        drawNextShape(x,y){
+        //Draw the provided shape in the mesh coordinates
+        drawShape(x, y, shapeType){
             
-            if(this.currentShape == 1){
-                var cross = new Cross(x,y, this.elementWidth, this.elementHeight, this.lineWidth);
-                cross.paint(this.ctx);
-            } else if(this.currentShape == -1) {
-                var circle = new Circle(x, y , this.elementRadiusx, this.elementRadiusy, this.lineWidth);
-                circle.paint(this.ctx);             
+            if(isNaN(x) || isNaN(y) || isNaN(shapeType)){
+                throw "X, Y or ShapeType is not a numbers";
             }
-        }
 
+            if(x > this.xcells || y > this.ycells) {
+                throw `x: ${x}, y: ${y} is out of bounds`;
+            }
+
+            let xcoord = x * this.elementWidth;
+            let ycoord = y * this.elementHeight;
+
+            let shape = shapeType == 1 
+                ? new Cross(xcoord, ycoord, this.elementWidth, this.elementHeight, this.lineWidth)
+                : new Circle(xcoord, ycoord , this.elementRadiusx, this.elementRadiusy, this.lineWidth);
+            shape.paint(this.ctx);
+        }      
+        
         reset(){
             this.draw();
         }
 
-        getWinner(x, y){
+        _getWinner(x, y){
 
             this.winningLines[x] += this.currentShape;
             if(Math.abs(this.winningLines[x]) == this.ycells) return this.currentShape;
@@ -183,8 +128,33 @@
                     }
                 }
             }
-            return 0;
+            return null;
 
+        }
+
+        _printWinnerMessage(winner){
+            if(winner != 0){
+                this.message.paint(this.ctx, `${this.currentShape == -1 ? "Circle" : "Cross"} Won`, 'Click to try Again');    
+                this.shapeCount = this.shapeLimit + 1;
+            } else if (this.shapeCount == this.shapeLimit){
+                this.message.paint(this.ctx, 'Draw', 'Click to Try Again');
+                this.shapeCount++;
+                return;
+            }
+        }
+        
+        _initBoard(){
+            this.board = [];
+            for(var x = 0; x < this.xcells; x++){
+                this.board.push([]);
+                for(var y = 0; y <this.ycells; y++){
+                    this.board[x].push(0);
+                }
+            }
+
+            this.winningLines = _.times(this.xcells + this.ycells + (this.diagonalLines * 2), _.constant(0));
+            this.currentShape = Enums.Shapes.Cross;
+            this.shapeCount = 0;
         }
     }
 
