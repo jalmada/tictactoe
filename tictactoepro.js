@@ -7,15 +7,31 @@
     import _ from 'lodash';
 
     class TicTacToePro {
-        constructor(canvasId, xcells, ycells){
+        constructor(canvasId, xcells, ycells, initialShape){
 
+            //Shape validation
+            this.initialShape = initialShape || Enums.Shapes.Cross;            
+            if(this.initialShape != Enums.Shapes.Circle && this.initialShape != Enums.Cross){
+                throw "Invalid Shape Type, only 1 (Cross) and -1 (Circle) are supported";
+            }
+
+            //CanvasId validation
             this.canvasId = canvasId;
             this.canvas = document.getElementById(this.canvasId);
-
-            this.ctx = this.canvas.getContext('2d');
-
+            if(!this.canvas){
+                throw `Canvas element ${canvasId} was not found.`
+            }
+            if(this.canvas.tagName.toLowerCase() != 'canvas'){
+                throw `Provided container id: ${canvasId} is not of type <canvas>`;
+            }            
+            
             this.xcells = xcells;
             this.ycells = ycells;
+            if(this.xcells < 1 || this.ycells < 1){
+                throw `Number of rows and columns must be positive. X: ${this.xcells}, Y: ${this.ycells}`;
+            }
+
+            this.ctx = this.canvas.getContext('2d');
             
             this.elementWidth = Math.ceil(this.canvas.width / this.xcells);
             this.elementHeight = Math.ceil(this.canvas.height / this.ycells);
@@ -30,29 +46,34 @@
             this.message = new Message(this.canvas.width, this.canvas.height);
             this.diagonalLines = Math.abs(this.xcells - this.ycells) + 1;
 
-
-            this.canvas.addEventListener('click', this._onTurn.bind(this), false);
+            this.canvas.addEventListener('click', this._onCanvasClick.bind(this), false);
             this._initBoard();            
         }
 
-        _onTurn(e){
+        _onCanvasClick(e){
+            let pos = Utils._getMousePos(e, this.canvas);
+            let x = Math.floor(pos.x/ this.elementWidth);
+            let y = Math.floor(pos.y/ this.elementHeight);
+
+            this.runNextTurn(x, y);
+        }
+
+        runNextTurn(x, y){
             if(this.shapeCount > this.shapeLimit){
                 this.reset();
                 return;
             }
 
-            let pos = Utils._getMousePos(e, this.canvas);
-            let x = Math.floor(pos.x/ this.elementWidth);
-            let y = Math.floor(pos.y/ this.elementHeight);
-
-            if (this.board[x][y] != 0) return;
+            if (this.board[x][y] != 0) {
+                throw `X: ${x}, Y: ${y}, is already taken, please make another selection`;
+            }
 
             this.board[x][y] = this.currentShape;
             this.drawShape(x, y, this.currentShape);
             this.shapeCount++;
 
             let winner = this._getWinner(x, y);
-            if(winner) this._printWinnerMessage();
+            if(winner != null) this._printWinnerMessage(winner);
 
             this.currentShape = this.currentShape == -1 ? 1 : -1;
         }
@@ -91,10 +112,14 @@
         
         reset(){
             this.draw();
+            this._initBoard();
         }
 
         _getWinner(x, y){
 
+            if(this.shapeCount == this.shapeLimit){
+                return 0;
+            }
             this.winningLines[x] += this.currentShape;
             if(Math.abs(this.winningLines[x]) == this.ycells) return this.currentShape;
 
@@ -136,7 +161,7 @@
             if(winner != 0){
                 this.message.paint(this.ctx, `${this.currentShape == -1 ? "Circle" : "Cross"} Won`, 'Click to try Again');    
                 this.shapeCount = this.shapeLimit + 1;
-            } else if (this.shapeCount == this.shapeLimit){
+            } else {
                 this.message.paint(this.ctx, 'Draw', 'Click to Try Again');
                 this.shapeCount++;
                 return;
@@ -153,8 +178,8 @@
             }
 
             this.winningLines = _.times(this.xcells + this.ycells + (this.diagonalLines * 2), _.constant(0));
-            this.currentShape = Enums.Shapes.Cross;
             this.shapeCount = 0;
+            this.currentShape = this.initialShape;
         }
     }
 
