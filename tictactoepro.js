@@ -11,7 +11,7 @@
 
             //Shape validation
             this.initialShape = initialShape || Enums.Shapes.Cross;            
-            if(this.initialShape != Enums.Shapes.Circle && this.initialShape != Enums.Cross){
+            if(this.initialShape != Enums.Shapes.Circle && this.initialShape != Enums.Shapes.Cross){
                 throw "Invalid Shape Type, only 1 (Cross) and -1 (Circle) are supported";
             }
 
@@ -47,6 +47,7 @@
             this.diagonalLines = Math.abs(this.xcells - this.ycells) + 1;
 
             this.canvas.addEventListener('click', this._onCanvasClick.bind(this), false);
+            
             this._initBoard();            
         }
 
@@ -55,27 +56,38 @@
             let x = Math.floor(pos.x/ this.elementWidth);
             let y = Math.floor(pos.y/ this.elementHeight);
 
-            this.runNextTurn(x, y);
+            this.runNextTurn(x, y, this.currentShape);
         }
 
-        runNextTurn(x, y){
+        runNextTurn(x, y, shapeType){
+            
             if(this.shapeCount > this.shapeLimit){
                 this.reset();
                 return;
+            }
+
+            if(isNaN(x) || isNaN(y)){
+                throw "X, Y or ShapeType is not a numbers";
             }
 
             if (this.board[x][y] != 0) {
                 throw `X: ${x}, Y: ${y}, is already taken, please make another selection`;
             }
 
+            if(isNaN(shapeType) || shapeType != "-1" && shapeType != "1"){
+                throw "Shape Type is not valid";
+            }
+            this.currentShape = parseInt(shapeType);
             this.board[x][y] = this.currentShape;
+            this.moves.push({x:x,y:y,s:this.currentShape});
             this.drawShape(x, y, this.currentShape);
             this.shapeCount++;
 
-            let winner = this._getWinner(x, y);
-            if(winner != null) this._printWinnerMessage(winner);
-
-            this.currentShape = this.currentShape == -1 ? 1 : -1;
+            this.winner = this._getWinner(x, y);
+            if(this.winner != null) this._printWinnerMessage(this.winner);
+            this.currentShape = this.currentShape == -1 ? 1 : -1;   
+            
+            //console.log(this.moves);
         }
 
         //draw the initial board
@@ -108,7 +120,28 @@
                 ? new Cross(xcoord, ycoord, this.elementWidth, this.elementHeight, this.lineWidth)
                 : new Circle(xcoord, ycoord , this.elementRadiusx, this.elementRadiusy, this.lineWidth);
             shape.paint(this.ctx);
-        }      
+        } 
+        
+        setMoves(moves){
+            moves = Array.isArray(moves) ? moves : [moves];
+            moves.forEach(function(m) {
+                try{
+                    this.runNextTurn(m.x, m.y, m.s);
+                } catch (e) {
+                    console.error(e);
+                }
+            }, this);
+
+            this.moves = moves
+        }
+
+        get Winner(){
+            return this.winner;
+        }
+
+        get LastMove(){
+            return this.moves.length > 0 ? this.moves[this.moves.length -1] : null;
+        }
         
         reset(){
             this.draw();
@@ -117,9 +150,7 @@
 
         _getWinner(x, y){
 
-            if(this.shapeCount == this.shapeLimit){
-                return 0;
-            }
+            
             this.winningLines[x] += this.currentShape;
             if(Math.abs(this.winningLines[x]) == this.ycells) return this.currentShape;
 
@@ -153,6 +184,10 @@
                     }
                 }
             }
+
+            if(this.shapeCount == this.shapeLimit){
+                return 0;
+            }
             return null;
 
         }
@@ -168,6 +203,7 @@
             }
         }
         
+
         _initBoard(){
             this.board = [];
             for(var x = 0; x < this.xcells; x++){
@@ -180,6 +216,8 @@
             this.winningLines = _.times(this.xcells + this.ycells + (this.diagonalLines * 2), _.constant(0));
             this.shapeCount = 0;
             this.currentShape = this.initialShape;
+            this.winner = null;
+            this.moves = [];
         }
     }
 
