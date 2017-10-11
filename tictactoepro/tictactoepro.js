@@ -11,7 +11,7 @@
 
             //Shape validation
             this.initialShape = initialShape || Enums.Shapes.Cross;            
-            if(this.initialShape != Enums.Shapes.Circle && this.initialShape != Enums.Cross){
+            if(this.initialShape != Enums.Shapes.Circle && this.initialShape != Enums.Shapes.Cross){
                 throw "Invalid Shape Type, only 1 (Cross) and -1 (Circle) are supported";
             }
 
@@ -125,6 +125,8 @@
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height, this.lineWidth / 2);
                 mesh.paint(this.ctx);
+
+                
             }
         }
 
@@ -150,8 +152,29 @@
                 ? new Cross(xcoord, ycoord, this.elementWidth, this.elementHeight, this.lineWidth)
                 : new Circle(xcoord, ycoord , this.elementRadiusx, this.elementRadiusy, this.lineWidth);
             shape.paint(this.ctx);
-        }      
-        
+        }     
+
+        setMoves(moves){
+            moves = Array.isArray(moves) ? moves : [moves];
+            moves.forEach(function(m) {
+                try{
+                    this.runNextTurn(m.x, m.y, m.s);
+                } catch (e) {
+                    console.error(e);
+                }
+            }, this);
+
+            this.moves = moves
+        }
+
+        get Winner(){
+            return this.winner;
+        }
+
+        get LastMove(){
+            return this.moves.length > 0 ? this.moves[this.moves.length -1] : null;
+        }
+
         reset(){
             this.board = this.initialBoard;
             this.draw();
@@ -163,6 +186,7 @@
         }
 
         _getWinner(x, y){
+
 
             if(this.shapeCount == this.shapeLimit){
                 return 0;
@@ -200,6 +224,10 @@
                     }
                 }
             }
+
+            if(this.shapeCount == this.shapeLimit){
+                return 0;
+            }
             return null;
 
         }
@@ -215,6 +243,7 @@
             }
         }
         
+
         _initBoard(){
             this.board = [[]];
             for(var x = 0; x < this.xcells; x++){
@@ -227,6 +256,8 @@
             this.winningLines = _.times(this.xcells + this.ycells + (this.diagonalLines * 2), _.constant(0));
             this.shapeCount = 0;
             this.currentShape = this.initialShape;
+            this.winner = null;
+            this.moves = [];
         }
     }
 
