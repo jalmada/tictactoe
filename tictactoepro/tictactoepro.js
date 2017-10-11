@@ -2,12 +2,12 @@
     import Cross from './cross.js';
     import Mesh from './mesh.js';
     import Message from './message.js';
-    import Utils from './utils.js';
+    import Utils from '../common/utils.js';
     import Enums from './enums.js';
     import _ from 'lodash';
 
     class TicTacToePro {
-        constructor(canvasId, xcells, ycells, initialShape){
+        constructor(canvasId, xcells, ycells, initialShape, initialBoard){
 
             //Shape validation
             this.initialShape = initialShape || Enums.Shapes.Cross;            
@@ -47,7 +47,24 @@
             this.diagonalLines = Math.abs(this.xcells - this.ycells) + 1;
 
             this.canvas.addEventListener('click', this._onCanvasClick.bind(this), false);
-            this._initBoard();            
+            this.board = [[]];
+            this.initialBoard = initialBoard;
+            let validInitialBoard = !!initialBoard;
+
+            if(this.initialBoard && Array.isArray(this.initialBoard) && this.initialBoard.length == this.xcells){
+                for(let x = 0; x < this.initialBoard.length; x++){
+                    if(!(this.initialBoard[x] && Array.isArray(this.initialBoard[x]) && this.initialBoard[x].length == this.ycells)){
+                        validInitialBoard = false;
+                        break;
+                    }
+                }
+            }
+            
+            if(!validInitialBoard){
+                this._initBoard();     
+            } else {
+                this.board = this.initialBoard;
+            }
         }
 
         _onCanvasClick(e){
@@ -58,21 +75,44 @@
             this.runNextTurn(x, y);
         }
 
-        runNextTurn(x, y){
-            if(this.shapeCount > this.shapeLimit){
-                this.reset();
-                return;
+        setTurn(x, y, shapeType)
+        {
+            if(isNaN(x) || isNaN(y) || isNaN(shapeType)){
+                throw "X, Y or ShapeType is not a numbers";
+            }
+
+            if(this.board.length <= x){
+                throw `X: ${x} is out of bounds`;
+            }
+
+            if(this.board[x].length <= y){
+                throw `Y: ${y} is out of bounds`;
             }
 
             if (this.board[x][y] != 0) {
                 throw `X: ${x}, Y: ${y}, is already taken, please make another selection`;
             }
 
-            this.board[x][y] = this.currentShape;
-            this.drawShape(x, y, this.currentShape);
-            this.shapeCount++;
+            if(shapeType != Enums.Shapes.Circle && shapeType != Enums.Shapes.Cross){
+                throw `Shape Type: ${shapeType}, is not a valid shape`;
+            }
 
+            this.board[x][y] = this.currentShape;
+            this.shapeCount++;
+            
             let winner = this._getWinner(x, y);
+            return winner;
+        }
+
+        runNextTurn(x, y){
+            if(this.shapeCount > this.shapeLimit){
+                this.clear();
+                return;
+            }
+
+            let winner = this.setTurn(x, y, this.currentShape);
+            this.drawShape(x, y, this.currentShape);
+
             if(winner != null) this._printWinnerMessage(winner);
 
             this.currentShape = this.currentShape == -1 ? 1 : -1;
@@ -83,8 +123,6 @@
             if (this.canvas.getContext) {
                 
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this._initBoard();
-
                 var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height, this.lineWidth / 2);
                 mesh.paint(this.ctx);
             }
@@ -92,13 +130,17 @@
 
         //Draw the provided shape in the mesh coordinates
         drawShape(x, y, shapeType){
-            
+
             if(isNaN(x) || isNaN(y) || isNaN(shapeType)){
                 throw "X, Y or ShapeType is not a numbers";
             }
 
             if(x > this.xcells || y > this.ycells) {
                 throw `x: ${x}, y: ${y} is out of bounds`;
+            }
+
+            if(shapeType != Enums.Shapes.Circle && shapeType != Enums.Shapes.Cross){
+                throw `Shape Type: ${shapeType}, is not a valid shape`;
             }
 
             let xcoord = x * this.elementWidth;
@@ -111,8 +153,13 @@
         }      
         
         reset(){
+            this.board = this.initialBoard;
             this.draw();
-            this._initBoard();
+        }
+
+        clear(){
+            this._initBoard();            
+            this.draw();
         }
 
         _getWinner(x, y){
@@ -169,7 +216,7 @@
         }
         
         _initBoard(){
-            this.board = [];
+            this.board = [[]];
             for(var x = 0; x < this.xcells; x++){
                 this.board.push([]);
                 for(var y = 0; y <this.ycells; y++){

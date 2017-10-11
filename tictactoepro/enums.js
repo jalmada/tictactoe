@@ -1,5 +1,3 @@
-
-
 class Enums {
     static get Shapes() {
      return {
