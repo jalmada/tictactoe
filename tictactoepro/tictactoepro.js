@@ -128,6 +128,14 @@
                 var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height, this.lineWidth / 2);
                 mesh.paint(this.ctx);
 
+                this.board.forEach((valx, x) => {
+                    valx.forEach((s, y) => {
+                        if(s == Enums.Shapes.Circle || s == Enums.Shapes.Cross){
+                            this.drawShape(x, y, s);
+                        }
+                    });
+                });
+
                 
             }
         }
