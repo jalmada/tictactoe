@@ -97,25 +97,27 @@
                 throw `Shape Type: ${shapeType}, is not a valid shape`;
             }
 
-            this.board[x][y] = this.currentShape;
+            this.board[x][y] = shapeType;
+            this.moves.push({x:x, y:y, s:shapeType});
             this.shapeCount++;
             
             let winner = this._getWinner(x, y);
             return winner;
         }
 
-        runNextTurn(x, y){
+        runNextTurn(x, y, shapeType){
+            shapeType = shapeType || this.currentShape;
             if(this.shapeCount > this.shapeLimit){
                 this.clear();
                 return;
             }
 
-            let winner = this.setTurn(x, y, this.currentShape);
-            this.drawShape(x, y, this.currentShape);
+            let winner = this.setTurn(x, y, shapeType);
+            this.drawShape(x, y, shapeType);
 
             if(winner != null) this._printWinnerMessage(winner);
 
-            this.currentShape = this.currentShape == -1 ? 1 : -1;
+            this.currentShape = shapeType == -1 ? 1 : -1;
         }
 
         //draw the initial board
