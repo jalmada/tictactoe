@@ -101,7 +101,7 @@
             this.moves.push({x:x, y:y, s:shapeType});
             this.shapeCount++;
             
-            let winner = this._getWinner(x, y);
+            let winner = this._getWinner(x, y, shapeType);
             return winner;
         }
 
@@ -195,13 +195,13 @@
             this.draw();
         }
 
-        _getWinner(x, y){
+        _getWinner(x, y, shapeType){
+            shapeType = shapeType || this.currentShape;
+            this.winningLines[x] += shapeType;
+            if(Math.abs(this.winningLines[x]) == this.ycells) return shapeType;
 
-            this.winningLines[x] += this.currentShape;
-            if(Math.abs(this.winningLines[x]) == this.ycells) return this.currentShape;
-
-            this.winningLines[y + this.xcells] += this.currentShape;
-            if(Math.abs(this.winningLines[y + this.xcells ]) == this.xcells) return this.currentShape;
+            this.winningLines[y + this.xcells] += shapeType;
+            if(Math.abs(this.winningLines[y + this.xcells ]) == this.xcells) return shapeType;
 
             let lowestCoord = Math.min(this.xcells, this.ycells);   
             let initialTopDownDiagIndex = this.xcells + this.ycells;
@@ -210,23 +210,23 @@
             for(let dn = 0; dn < this.diagonalLines; dn++){
                 if(this.xcells <= this.ycells){
                     if(x - (y - dn) == 0){
-                        this.winningLines[initialTopDownDiagIndex + dn] += this.currentShape;
-                        if(Math.abs(this.winningLines[initialTopDownDiagIndex + dn]) == lowestCoord) return this.currentShape;
+                        this.winningLines[initialTopDownDiagIndex + dn] += shapeType;
+                        if(Math.abs(this.winningLines[initialTopDownDiagIndex + dn]) == lowestCoord) return shapeType;
                     }
 
                     if((x + (y - dn)) == lowestCoord - 1){
-                        this.winningLines[initialDownTopDiagIndex + dn] += this.currentShape;
-                        if(Math.abs(this.winningLines[initialDownTopDiagIndex + dn]) == lowestCoord) return this.currentShape;
+                        this.winningLines[initialDownTopDiagIndex + dn] += shapeType;
+                        if(Math.abs(this.winningLines[initialDownTopDiagIndex + dn]) == lowestCoord) return shapeType;
                     }
                 } else {
                     if(y - (x - dn) == 0){
-                        this.winningLines[initialTopDownDiagIndex + dn] += this.currentShape;
-                        if(Math.abs(this.winningLines[initialTopDownDiagIndex + dn]) == lowestCoord) return this.currentShape;
+                        this.winningLines[initialTopDownDiagIndex + dn] += shapeType;
+                        if(Math.abs(this.winningLines[initialTopDownDiagIndex + dn]) == lowestCoord) return shapeType;
                     } 
 
                     if((y + (x - dn)) == lowestCoord - 1){
-                        this.winningLines[initialDownTopDiagIndex + dn] += this.currentShape;
-                        if(Math.abs(this.winningLines[initialDownTopDiagIndex + dn]) == lowestCoord) return this.currentShape;
+                        this.winningLines[initialDownTopDiagIndex + dn] += shapeType;
+                        if(Math.abs(this.winningLines[initialDownTopDiagIndex + dn]) == lowestCoord) return shapeType;
                     }
                 }
             }
