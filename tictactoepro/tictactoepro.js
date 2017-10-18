@@ -197,10 +197,6 @@
 
         _getWinner(x, y){
 
-
-            if(this.shapeCount == this.shapeLimit){
-                return 0;
-            }
             this.winningLines[x] += this.currentShape;
             if(Math.abs(this.winningLines[x]) == this.ycells) return this.currentShape;
 
