@@ -122,6 +122,7 @@
 
         //draw the initial board
         draw() {
+            
             if (this.canvas.getContext) {
                 
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
