@@ -12,9 +12,12 @@ class Mesh {
         this.cellheight = Math.ceil(height/cellsy);
     }
     
-    paint(ctx){
+    paint(ctx, color){
+        var prevStrokeStyle = ctx.strokeStyle;
+        color = color || "rgb(0,0,0)";
+        
         for(var x = 0, xpos = this.cellwidth; x < this.countVLines; x++, xpos = xpos + this.cellwidth){
-            ctx.strokeStyle = "rgb(0,0,0)";
+            ctx.strokeStyle = color;
             ctx.lineWidth=this.lineWidth;
             ctx.beginPath();
             ctx.moveTo(xpos,5);
@@ -23,13 +26,16 @@ class Mesh {
         }
 
         for(var y = 0, ypos = this.cellheight; y < this.countHLines; y++, ypos = ypos + this.cellheight){
-            ctx.strokeStyle = "rgb(0,0,0)";
+            ctx.strokeStyle = color;
             ctx.lineWidth=this.lineWidth;
             ctx.beginPath();
             ctx.moveTo(5,ypos);
             ctx.lineTo(this.width - 5, ypos);
             ctx.stroke();
         }           
+
+
+        ctx.strokeStyle = prevStrokeStyle;
     }
 }
 

@@ -5,9 +5,10 @@
     import Utils from '../common/utils.js';
     import Enums from './enums.js';
     import _ from 'lodash';
-
+/////Cambia la implementacion para que el canvas sea creado como parte del tablero, de esa manera en la implementacion recursiva no tenemos que compartir camvas
+//// Ademas permite aislar el canvas para que sea usado solo por el tablero aunque sea en forma tradicional.
     class TicTacToePro {
-        constructor(canvasId, xcells, ycells, initialShape, initialBoard){
+        constructor(containerId, xcells, ycells, initialShape, initialBoard){
 
             //Shape validation
             this.initialShape = initialShape || Enums.Shapes.Cross;            
@@ -118,16 +119,17 @@
             if(winner != null) this._printWinnerMessage(winner);
 
             this.currentShape = shapeType == -1 ? 1 : -1;
+            return winner;
         }
 
         //draw the initial board
-        draw() {
+        draw(meshColor) {
             
             if (this.canvas.getContext) {
                 
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height, this.lineWidth / 2);
-                mesh.paint(this.ctx);
+                mesh.paint(this.ctx, meshColor);
 
                 this.board.forEach((valx, x) => {
                     valx.forEach((s, y) => {
