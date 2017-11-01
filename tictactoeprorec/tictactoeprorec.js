@@ -2,8 +2,8 @@ import TicTacToePro from '../tictactoepro/tictactoepro.js';
 import Utils from '../common/utils.js';
 
 class TicTacToeProRec extends TicTacToePro{
-    constructor(canvasId, xcells, ycells, initialShape, levels, parentBoard){
-        super(canvasId, xcells, ycells, initialShape);
+    constructor(containerId, xcells, ycells, initialShape, levels, parentBoard, upperX, upperY){
+        super(containerId, xcells, ycells, initialShape);
 
         this.levels = levels || 1;
 
@@ -11,17 +11,26 @@ class TicTacToeProRec extends TicTacToePro{
         this.mainBoard = this;
         this.subBoardsNum = this.xcells * this.ycells;
         this.parentBoard = parentBoard;
+        this.upperX = upperX;
+        this.upperY = upperY;
         
         this._initBoards();
 
     }
 
-    runNextTurn(x, y){
+    runNextTurn(x, y, shapeType)
+    {
         if(!!this.subBoards && x < this.subBoards.length && y < this.subBoards[x].length  && !this.subBoards[x][y].Winner){
             this.goToSubBoard(x,y);
         } else {
-            super.runNextTurn(x, y);
+            let winner = super.runNextTurn(x, y, shapeType);
+            this.winner = winner;
+            if(winner && this.parentBoard){
+                this.parentBoard.runNextTurn(this.upperX, this.upperY, winner);
+            }
         }
+
+        
     }
 
     _onCanvasClick(e){
@@ -31,12 +40,7 @@ class TicTacToeProRec extends TicTacToePro{
         let y = Math.floor(pos.y/ this.elementHeight);
 
 
-        var winner = this.runNextTurn(x, y);
-
-
-        if(winner && this.parentBoard){
-            //this.parentBoard.runNextTurn() //Save the origin position to be used here where the subboard is solved
-        }
+        this.runNextTurn(x, y);
     }
 
     goToSubBoard(x, y){
@@ -48,9 +52,7 @@ class TicTacToeProRec extends TicTacToePro{
         }
 
         if(this.subBoards[x][y]){
-            this.subBoards[x][y].draw("rgb(255,0,0)");           
-            this.canvas.removeEventListener("click");
-            this.canvas.addEventListener("click", this.subBoards[x][y]._onCanvasClick);
+            this.subBoards[x][y].draw(800, 800, "rgb(255,0,0)");
 
         }
     }
@@ -59,10 +61,10 @@ class TicTacToeProRec extends TicTacToePro{
         if(this.levels > 1){
             this.subBoards = [];
             for(var x = 0; x < this.xcells; x++){
-                this.board.push([]);
+                this.subBoards.push([]);
                 for(var y = 0; y <this.ycells; y++){
-                    let newSubboard = new TicTacToeProRec(this.canvasId, this.xcells, this.ycells, this.initialShape, this.levels - 1, this);
-                    this.board[x].push(newSubboard);                    
+                    let newSubboard = new TicTacToeProRec(this.containerId, this.xcells, this.ycells, this.initialShape, this.levels - 1, this, x, y);
+                    this.subBoards[x].push(newSubboard);                    
                 }
             }
         }

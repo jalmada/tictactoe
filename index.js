@@ -5,7 +5,7 @@ import './style.css'
 import $ from 'jquery';
 
 var ticTacToeRec = new TicTacToeProRec("tictactoerec", 3, 3, Enums.Shapes.Circle, 2);
-ticTacToeRec.draw();
+ticTacToeRec.draw( 800, 800);
 
 
 $("#clear").on("click", (e) => ticTacToeRec.clear())

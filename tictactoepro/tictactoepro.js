@@ -5,8 +5,7 @@
     import Utils from '../common/utils.js';
     import Enums from './enums.js';
     import _ from 'lodash';
-/////Cambia la implementacion para que el canvas sea creado como parte del tablero, de esa manera en la implementacion recursiva no tenemos que compartir camvas
-//// Ademas permite aislar el canvas para que sea usado solo por el tablero aunque sea en forma tradicional.
+
     class TicTacToePro {
         constructor(containerId, xcells, ycells, initialShape, initialBoard){
 
@@ -17,14 +16,12 @@
             }
 
             //CanvasId validation
-            this.canvasId = canvasId;
-            this.canvas = document.getElementById(this.canvasId);
-            if(!this.canvas){
-                throw `Canvas element ${canvasId} was not found.`
-            }
-            if(this.canvas.tagName.toLowerCase() != 'canvas'){
-                throw `Provided container id: ${canvasId} is not of type <canvas>`;
-            }            
+            this.containerId = containerId;
+            this.container = document.getElementById(this.containerId);
+            
+            if(!this.container){
+                throw `Container element ${this.containerId} was not found.`
+            }         
             
             this.xcells = xcells;
             this.ycells = ycells;
@@ -32,22 +29,13 @@
                 throw `Number of rows and columns must be positive. X: ${this.xcells}, Y: ${this.ycells}`;
             }
 
-            this.ctx = this.canvas.getContext('2d');
-            
-            this.elementWidth = Math.ceil(this.canvas.width / this.xcells);
-            this.elementHeight = Math.ceil(this.canvas.height / this.ycells);
-            this.elementRadiusx = Math.ceil((this.canvas.width / this.xcells)/2);
-            this.elementRadiusy = Math.ceil((this.canvas.height / this.ycells)/2);
+            this.canvasWidth = 300;
+            this.canvasHeight = 300;
 
             this.diagonalAmount = (Math.abs(this.xcells - this.ycells) + 1) * 2;
-
             this.shapeLimit = this.xcells * this.ycells;
-            this.lineWidth = ((this.canvas.width + this.canvas.height) / 2) * .02 ;
-
-            this.message = new Message(this.canvas.width, this.canvas.height);
             this.diagonalLines = Math.abs(this.xcells - this.ycells) + 1;
 
-            this.canvas.addEventListener('click', this._onCanvasClick.bind(this), false);
             this.board = [[]];
             this.initialBoard = initialBoard;
             let validInitialBoard = !!initialBoard;
@@ -73,7 +61,7 @@
             let x = Math.floor(pos.x/ this.elementWidth);
             let y = Math.floor(pos.y/ this.elementHeight);
 
-            this.runNextTurn(x, y);
+            this.winner = this.runNextTurn(x, y);
         }
 
         setTurn(x, y, shapeType)
@@ -122,10 +110,43 @@
             return winner;
         }
 
-        //draw the initial board
-        draw(meshColor) {
+        _initCanvas(){
             
+            this.canvas = document.createElement("canvas");
+            this.canvas.width = this.container.clientWidth;
+            this.canvas.height = this.container.clientHeight;
+
+            this.canvas.width = this.canvasWidth;
+            this.canvas.height = this.canvasHeight;
+            
+            this.container.appendChild(this.canvas);
+            this.ctx = this.canvas.getContext('2d');
+            this.canvas.addEventListener('click', this._onCanvasClick.bind(this), false); 
+            this.elementWidth = Math.ceil(this.canvas.width / this.xcells);
+            this.elementHeight = Math.ceil(this.canvas.height / this.ycells);
+            this.elementRadiusx = Math.ceil((this.canvas.width / this.xcells)/2);
+            this.elementRadiusy = Math.ceil((this.canvas.height / this.ycells)/2);
+
+            this.lineWidth = ((this.canvas.width + this.canvas.height) / 2) * .02 ;
+            this.message = new Message(this.canvas.width, this.canvas.height);                   
+            
+        }
+
+        //draw the initial board
+        draw(width, height, meshColor) {
+            
+            this.canvasWidth = width || this.canvasWidth;
+            this.canvasHeight = height || this.canvasHeight;
+
+
+            if(!this.canvas){
+                this._initCanvas();
+            }
+
+            meshColor = meshColor || "rgb(0,0,0)";
             if (this.canvas.getContext) {
+            
+                
                 
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height, this.lineWidth / 2);
@@ -171,7 +192,7 @@
             moves = Array.isArray(moves) ? moves : [moves];
             moves.forEach(function(m) {
                 try{
-                    this.runNextTurn(m.x, m.y, m.s);
+                    this.winner = this.runNextTurn(m.x, m.y, m.s);
                 } catch (e) {
                     console.error(e);
                 }
