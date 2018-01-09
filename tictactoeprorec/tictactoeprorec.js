@@ -28,9 +28,7 @@ class TicTacToeProRec extends TicTacToePro{
             if(winner && this.parentBoard){
                 this.parentBoard.runNextTurn(this.upperX, this.upperY, winner);
             }
-        }
-
-        
+        }        
     }
 
     _onCanvasClick(e){
