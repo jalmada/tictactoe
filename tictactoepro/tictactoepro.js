@@ -38,6 +38,7 @@
 
             this.board = [[]];
             this.initialBoard = initialBoard;
+            this.meshColor = "rgb(0,0,0)";
             let validInitialBoard = !!initialBoard;
 
             if(this.initialBoard && Array.isArray(this.initialBoard) && this.initialBoard.length == this.xcells){
@@ -137,20 +138,20 @@
             
             this.canvasWidth = width || this.canvasWidth;
             this.canvasHeight = height || this.canvasHeight;
+            this.meshColor = meshColor || this.meshColor;
 
 
             if(!this.canvas){
                 this._initCanvas();
             }
 
-            meshColor = meshColor || "rgb(0,0,0)";
             if (this.canvas.getContext) {
             
                 
                 
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height, this.lineWidth / 2);
-                mesh.paint(this.ctx, meshColor);
+                var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height, this.lineWidth / 2, this.meshColor);
+                mesh.paint(this.ctx);
 
                 this.board.forEach((valx, x) => {
                     valx.forEach((s, y) => {
@@ -264,7 +265,7 @@
 
         _printWinnerMessage(winner){
             if(winner != 0){
-                this.message.paint(this.ctx, `${this.currentShape == -1 ? "Circle" : "Cross"} Won`, 'Click to try Again');    
+                this.message.paint(this.ctx, `${winner == -1 ? "Circle" : "Cross"} Won`, 'Click to try Again');    
                 this.shapeCount = this.shapeLimit + 1;
             } else {
                 this.message.paint(this.ctx, 'Draw', 'Click to Try Again');

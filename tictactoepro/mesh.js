@@ -1,5 +1,5 @@
 class Mesh {
-    constructor(cellsx, cellsy, width, height, lineWidth){
+    constructor(cellsx, cellsy, width, height, lineWidth, color){
         this.cellsx = cellsx;
         this.cellsy = cellsy;
         this.width = width;
@@ -10,14 +10,15 @@ class Mesh {
         this.countHLines = cellsy - 1;
         this.cellwidth = Math.ceil(width/cellsx);
         this.cellheight = Math.ceil(height/cellsy);
+        this.color = color || "rgb(0,0,0)";
     }
     
     paint(ctx, color){
         var prevStrokeStyle = ctx.strokeStyle;
-        color = color || "rgb(0,0,0)";
+        this.color = color || this.color;
         
         for(var x = 0, xpos = this.cellwidth; x < this.countVLines; x++, xpos = xpos + this.cellwidth){
-            ctx.strokeStyle = color;
+            ctx.strokeStyle = this.color;
             ctx.lineWidth=this.lineWidth;
             ctx.beginPath();
             ctx.moveTo(xpos,5);
@@ -26,7 +27,7 @@ class Mesh {
         }
 
         for(var y = 0, ypos = this.cellheight; y < this.countHLines; y++, ypos = ypos + this.cellheight){
-            ctx.strokeStyle = color;
+            ctx.strokeStyle = this.color;
             ctx.lineWidth=this.lineWidth;
             ctx.beginPath();
             ctx.moveTo(5,ypos);
