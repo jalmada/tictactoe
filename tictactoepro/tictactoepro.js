@@ -219,6 +219,12 @@
             this._initBoard();            
             this.draw();
         }
+        
+        _removeCanvas(){
+            if(this.canvas){
+                this.canvas.parentElement.removeChild(this.canvas);
+            }
+        }
 
         _getWinner(x, y, shapeType){
             shapeType = shapeType || this.currentShape;

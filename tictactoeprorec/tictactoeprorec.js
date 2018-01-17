@@ -68,6 +68,27 @@ class TicTacToeProRec extends TicTacToePro{
         }
     }
 
+    _clearSubBoards(){
+        if(this.levels > 1){
+            for(var x = 0; x < this.xcells; x++){
+                for(var y = 0; y <this.ycells; y++){
+                    let subboard = this.subBoards[x][y];
+                    if(subboard){
+                        subboard._removeCanvas();
+                    }                    
+                }
+            }
+        }
+
+        this._initBoards();
+    }
+
+
+    clear(){
+        super.clear();
+        this._clearSubBoards();
+    }
+
 }
 
 export default TicTacToeProRec
