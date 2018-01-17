@@ -140,15 +140,12 @@
             this.canvasHeight = height || this.canvasHeight;
             this.meshColor = meshColor || this.meshColor;
 
-
             if(!this.canvas){
                 this._initCanvas();
             }
 
             if (this.canvas.getContext) {
-            
-                
-                
+
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height, this.lineWidth / 2, this.meshColor);
                 mesh.paint(this.ctx);
@@ -159,9 +156,7 @@
                             this.drawShape(x, y, s);
                         }
                     });
-                });
-
-                
+                });                
             }
         }
 

@@ -15,7 +15,6 @@ class TicTacToeProRec extends TicTacToePro{
         this.upperY = upperY;
         
         this._initBoards();
-
     }
 
     runNextTurn(x, y, shapeType)
@@ -37,7 +36,6 @@ class TicTacToeProRec extends TicTacToePro{
         let x = Math.floor(pos.x/ this.elementWidth);
         let y = Math.floor(pos.y/ this.elementHeight);
 
-
         this.runNextTurn(x, y);
     }
 
@@ -51,7 +49,6 @@ class TicTacToeProRec extends TicTacToePro{
 
         if(this.subBoards[x][y]){
             this.subBoards[x][y].draw(800, 800, "rgb(255,0,0)");
-
         }
     }
 
@@ -82,7 +79,6 @@ class TicTacToeProRec extends TicTacToePro{
 
         this._initBoards();
     }
-
 
     clear(){
         super.clear();
