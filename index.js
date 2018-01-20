@@ -4,7 +4,7 @@ import TicTacToeProRec from './tictactoeprorec/tictactoeprorec.js';
 import './style.css'
 import $ from 'jquery';
 
-var ticTacToeRec = new TicTacToeProRec("tictactoerec", 3, 3, Enums.Shapes.Circle, 2);
+var ticTacToeRec = new TicTacToeProRec("tictactoerec", 3, 3, Enums.Shapes.Circle, 3);
 ticTacToeRec.draw( 800, 800);
 
 
