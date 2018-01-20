@@ -218,6 +218,7 @@
         _removeCanvas(){
             if(this.canvas){
                 this.canvas.parentElement.removeChild(this.canvas);
+                this.canvas = null;
             }
         }
 
