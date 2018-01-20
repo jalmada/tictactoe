@@ -20,7 +20,7 @@ class TicTacToeProRec extends TicTacToePro{
     runNextTurn(x, y, shapeType)
     {
         if(!!this.subBoards && x < this.subBoards.length && y < this.subBoards[x].length  && !this.subBoards[x][y].Winner && !this.Winner){
-            this.goToSubBoard(x,y);
+            this.goToSubBoard(x,y, shapeType);
         } else {
             let winner = super.runNextTurn(x, y, shapeType);
             this.winner = winner;
@@ -38,10 +38,10 @@ class TicTacToeProRec extends TicTacToePro{
         let x = Math.floor(pos.x/ this.elementWidth);
         let y = Math.floor(pos.y/ this.elementHeight);
 
-        this.runNextTurn(x, y);
+        this.runNextTurn(x, y, this.currentShape);
     }
 
-    goToSubBoard(x, y){
+    goToSubBoard(x, y, shapeType){
         if(this.subBoards.length <= x){
             throw `Index x: ${x} out of bounds`;
         }
@@ -53,6 +53,9 @@ class TicTacToeProRec extends TicTacToePro{
 
         if(this.subBoards[x][y]){
             this.subBoards[x][y].draw(800, 800, "rgb(255,0,0)");
+            if(!!shapeType){
+                this.subBoards[x][y].runNextTurn(x, y, shapeType);
+            }
         }
     }
 
