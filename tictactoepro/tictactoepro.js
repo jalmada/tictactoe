@@ -7,7 +7,7 @@
     import _ from 'lodash';
 
     class TicTacToePro {
-        constructor(containerId, xcells, ycells, initialShape, initialBoard){
+        constructor(containerId, xcells, ycells, initialShape, initialBoard, color){
 
             //Shape validation
             this.initialShape = initialShape || Enums.Shapes.Cross;            
@@ -38,7 +38,7 @@
 
             this.board = [[]];
             this.initialBoard = initialBoard;
-            this.meshColor = "rgb(0,0,0)";
+            this.Color = color || "rgb(0,0,0)";
             let validInitialBoard = !!initialBoard;
 
             if(this.initialBoard && Array.isArray(this.initialBoard) && this.initialBoard.length == this.xcells){
@@ -134,11 +134,11 @@
         }
 
         //draw the initial board
-        draw(width, height, meshColor) {
+        draw(width, height, color) {
             
             this.canvasWidth = width || this.canvasWidth;
             this.canvasHeight = height || this.canvasHeight;
-            this.meshColor = meshColor || this.meshColor;
+            this.Color = color || this.Color;
 
             if(!this.canvas){
                 this._initCanvas();
@@ -147,7 +147,7 @@
             if (this.canvas.getContext) {
 
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height, this.lineWidth / 2, this.meshColor);
+                var mesh = new Mesh(this.xcells,this.ycells,this.canvas.width,this.canvas.height, this.lineWidth / 2, this.Color);
                 mesh.paint(this.ctx);
 
                 this.board.forEach((valx, x) => {
@@ -181,7 +181,7 @@
             let shape = shapeType == 1 
                 ? new Cross(xcoord, ycoord, this.elementWidth, this.elementHeight, this.lineWidth)
                 : new Circle(xcoord, ycoord , this.elementRadiusx, this.elementRadiusy, this.lineWidth);
-            shape.paint(this.ctx);
+            shape.paint(this.ctx, this.Color);
         }     
 
         setMoves(moves){
