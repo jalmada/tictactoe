@@ -2,18 +2,16 @@ import TicTacToePro from '../tictactoepro/tictactoepro.js';
 import Utils from '../common/utils.js';
 
 class TicTacToeProRec extends TicTacToePro{
-    constructor(containerId, xcells, ycells, initialShape, levels, parentBoard, upperX, upperY){
-        super(containerId, xcells, ycells, initialShape);
+    constructor(containerId, xcells, ycells, initialShape, levels, parentBoard, upperX, upperY, color){
+        super(containerId, xcells, ycells, initialShape, null,  color);
 
         this.levels = levels || 1;
-
         this.subBoards = [];
         this.mainBoard = this;
         this.subBoardsNum = this.xcells * this.ycells;
         this.parentBoard = parentBoard;
         this.upperX = upperX;
         this.upperY = upperY;
-        
         this._initBoards();
     }
 
@@ -52,7 +50,7 @@ class TicTacToeProRec extends TicTacToePro{
         this._removeCanvas();
 
         if(this.subBoards[x][y]){
-            this.subBoards[x][y].draw(800, 800, "rgb(255,0,0)");
+            this.subBoards[x][y].draw(this.canvasWidth, this.canvasWidth);
             if(!!shapeType){
                 this.subBoards[x][y].runNextTurn(x, y, shapeType);
             }
@@ -65,7 +63,8 @@ class TicTacToeProRec extends TicTacToePro{
             for(var x = 0; x < this.xcells; x++){
                 this.subBoards.push([]);
                 for(var y = 0; y <this.ycells; y++){
-                    let newSubboard = new TicTacToeProRec(this.containerId, this.xcells, this.ycells, this.initialShape, this.levels - 1, this, x, y);
+                    let subcolor =  this.getLevelColor(this.levels - 1);
+                    let newSubboard = new TicTacToeProRec(this.containerId, this.xcells, this.ycells, this.initialShape, this.levels - 1, this, x, y, subcolor);
                     this.subBoards[x].push(newSubboard);                    
                 }
             }
@@ -91,6 +90,18 @@ class TicTacToeProRec extends TicTacToePro{
         super.clear();
         this._clearSubBoards();
     }
+
+    getLevelColor(level){
+        var colorToChange = level % 3;
+        var colors = this.Color.replace("rgb","").replace("(","").replace(")","").trim().split(",");
+        var newColorSection = parseInt(colors[colorToChange]) + 127;
+        newColorSection = newColorSection > 255 ? 0 : newColorSection;
+        colors[colorToChange] = newColorSection;
+
+        var colorStr = `rgb(${colors.join(",")})`;
+        return colorStr;
+    }
+
 
 }
 

@@ -8,8 +8,8 @@ class Cross {
         this.height = height - (this.offset * 2);
     }
 
-    paint(ctx){
-        ctx.strokeStyle = "rgb(0,0,0)";
+    paint(ctx, color){
+        ctx.strokeStyle = color || "rgb(0,0,0)";
         ctx.lineWidth=this.lineWidth;
         ctx.beginPath();
         ctx.moveTo(this.x,this.y);

@@ -4,8 +4,8 @@ import TicTacToeProRec from './tictactoeprorec/tictactoeprorec.js';
 import './style.css'
 import $ from 'jquery';
 
-var ticTacToeRec = new TicTacToeProRec("tictactoerec", 3, 3, Enums.Shapes.Circle, 3);
-ticTacToeRec.draw( 800, 800);
+var ticTacToeRec = new TicTacToeProRec("tictactoerec", 3, 3, Enums.Shapes.Circle, 4);
+ticTacToeRec.draw( 800, 800,"rgb(0,0,0)");
 
 
 $("#clear").on("click", (e) => ticTacToeRec.clear())
