@@ -1,8 +1,10 @@
 import TicTacToePro from '../tictactoepro/tictactoepro.js';
 import Utils from '../common/utils.js';
+import Enums from './enums.js';
+
 
 class TicTacToeProRec extends TicTacToePro{
-    constructor(containerId, xcells, ycells, initialShape, levels, parentBoard, upperX, upperY, color){
+    constructor(containerId, xcells, ycells, initialShape, levels, parentBoard, upperX, upperY, color, gameMode, drawMode){
         super(containerId, xcells, ycells, initialShape, null,  color);
 
         this.levels = levels || 1;
@@ -12,20 +14,34 @@ class TicTacToeProRec extends TicTacToePro{
         this.parentBoard = parentBoard;
         this.upperX = upperX;
         this.upperY = upperY;
+        this.gameMode = gameMode || Enums.GameMode.NewLevelGetsPrevLevel;
+        this.drawMode = drawMode || Enums.DrawMode.NextTurnWins;
         this._initBoards();
     }
 
     runNextTurn(x, y, shapeType)
     {
         if(!!this.subBoards && x < this.subBoards.length && y < this.subBoards[x].length  && !this.subBoards[x][y].Winner && !this.Winner){
-            this.goToSubBoard(x,y, shapeType);
+            this.goToSubBoard(x,y, this.gameMode == Enums.GameMode.NewLevelRestart ? 0 : shapeType);
         } else {
-            let winner = super.runNextTurn(x, y, shapeType);
-            this.winner = winner;
-            if(winner && this.parentBoard){
+            this.winner = super.runNextTurn(x, y, shapeType);
+            if(this.winner === 0){
+                if(this.drawMode == Enums.DrawMode.Restart){
+                    this.clear();
+                } else if (this.drawMode == Enums.DrawMode.LeaveEmpty){
+                    this.clear();
+                    this._removeCanvas();
+                    this.parentBoard.draw();                    
+                } else if (this.drawMode == Enums.DrawMode.NextTurnWins){
+                    this._removeCanvas();
+                    this.parentBoard.draw();
+                    this.winner = this.currentShape;
+                    this.parentBoard.runNextTurn(this.upperX, this.upperY, this.winner); 
+                }
+            } else if(this.winner && this.parentBoard){
                 this._removeCanvas();
                 this.parentBoard.draw();
-                this.parentBoard.runNextTurn(this.upperX, this.upperY, winner);
+                this.parentBoard.runNextTurn(this.upperX, this.upperY, this.winner);
             }
         }        
     }
@@ -64,7 +80,7 @@ class TicTacToeProRec extends TicTacToePro{
                 this.subBoards.push([]);
                 for(var y = 0; y <this.ycells; y++){
                     let subcolor =  this.getLevelColor(this.levels - 1);
-                    let newSubboard = new TicTacToeProRec(this.containerId, this.xcells, this.ycells, this.initialShape, this.levels - 1, this, x, y, subcolor);
+                    let newSubboard = new TicTacToeProRec(this.containerId, this.xcells, this.ycells, this.initialShape, this.levels - 1, this, x, y, subcolor, this.gameMode, this.drawMode);
                     this.subBoards[x].push(newSubboard);                    
                 }
             }
@@ -101,6 +117,7 @@ class TicTacToeProRec extends TicTacToePro{
         var colorStr = `rgb(${colors.join(",")})`;
         return colorStr;
     }
+
 
 
 }
