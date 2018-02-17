@@ -1,10 +1,11 @@
 import Enums from './tictactoepro/enums.js';
+import RecEnums from './tictactoeprorec/enums.js';
 import TicTacToeProRec from './tictactoeprorec/tictactoeprorec.js';
 
 import './style.css'
 import $ from 'jquery';
 
-var ticTacToeRec = new TicTacToeProRec("tictactoerec", 3, 3, Enums.Shapes.Circle, 4);
+var ticTacToeRec = new TicTacToeProRec("tictactoerec", 3, 3, Enums.Shapes.Circle, 2, null, null, null, null, RecEnums.GameMode.NewLevelRestart, null);
 ticTacToeRec.draw( 800, 800,"rgb(0,0,0)");
 
 
