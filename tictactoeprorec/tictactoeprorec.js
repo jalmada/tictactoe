@@ -19,6 +19,14 @@ class TicTacToeProRec extends TicTacToePro{
         this._initBoards();
     }
 
+    goToParentBoard(){
+        if(!this.parentBoard){
+            throw 'You are in the top most level';
+        }
+        this._removeCanvas();
+        this.parentBoard.draw(); 
+    }
+
     runNextTurn(x, y, shapeType)
     {
         if(!!this.subBoards && x < this.subBoards.length && y < this.subBoards[x].length  && !this.subBoards[x][y].Winner && !this.Winner){
@@ -30,17 +38,14 @@ class TicTacToeProRec extends TicTacToePro{
                     this.clear();
                 } else if (this.drawMode == Enums.DrawMode.LeaveEmpty){
                     this.clear();
-                    this._removeCanvas();
-                    this.parentBoard.draw();                    
+                    this.goToParentBoard();                                                        
                 } else if (this.drawMode == Enums.DrawMode.NextTurnWins){
-                    this._removeCanvas();
-                    this.parentBoard.draw();
+                    this.goToParentBoard();                    
                     this.winner = this.currentShape;
                     this.parentBoard.runNextTurn(this.upperX, this.upperY, this.winner); 
                 }
             } else if(this.winner && this.parentBoard){
-                this._removeCanvas();
-                this.parentBoard.draw();
+                this.goToParentBoard();
                 this.parentBoard.runNextTurn(this.upperX, this.upperY, this.winner);
             }
         }        
