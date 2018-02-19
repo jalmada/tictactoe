@@ -10,6 +10,7 @@ class TicTacToeProRec extends TicTacToePro{
         this.levels = levels || 1;
         this.subBoards = [];
         this.mainBoard = this;
+        this.currentBoard = this;
         this.subBoardsNum = this.xcells * this.ycells;
         this.parentBoard = parentBoard;
         this.upperX = upperX;
@@ -19,10 +20,20 @@ class TicTacToeProRec extends TicTacToePro{
         this._initBoards();
     }
 
+    goToParentBoard(){
+        if(!this.parentBoard){
+            throw 'You are in the top most level';
+        }
+        this._removeCanvas();
+        this.parentBoard.draw();
+        this.mainBoard.currentBoard  = this.parentBoard; 
+
+    }
+
     runNextTurn(x, y, shapeType)
     {
         if(!!this.subBoards && x < this.subBoards.length && y < this.subBoards[x].length  && !this.subBoards[x][y].Winner && !this.Winner){
-            this.goToSubBoard(x,y, this.gameMode == Enums.GameMode.NewLevelRestart ? 0 : shapeType);
+            this.goToSubBoard(x,y, this.gameMode == Enums.GameMode.NewLevelRestart ? 0 : shapeType, this.mainBoard);
         } else {
             this.winner = super.runNextTurn(x, y, shapeType);
             if(this.winner === 0){
@@ -30,20 +41,24 @@ class TicTacToeProRec extends TicTacToePro{
                     this.clear();
                 } else if (this.drawMode == Enums.DrawMode.LeaveEmpty){
                     this.clear();
-                    this._removeCanvas();
-                    this.parentBoard.draw();                    
+                    this.goToParentBoard();                                                        
                 } else if (this.drawMode == Enums.DrawMode.NextTurnWins){
-                    this._removeCanvas();
-                    this.parentBoard.draw();
+                    this.goToParentBoard();                    
                     this.winner = this.currentShape;
                     this.parentBoard.runNextTurn(this.upperX, this.upperY, this.winner); 
                 }
             } else if(this.winner && this.parentBoard){
-                this._removeCanvas();
-                this.parentBoard.draw();
+                this.goToParentBoard();
                 this.parentBoard.runNextTurn(this.upperX, this.upperY, this.winner);
             }
         }        
+    }
+
+    goOneLevelUp(){
+        if(!this.parentBoard){
+            throw 'You are at the top most level';
+        }
+        this.goToParentBoard();
     }
 
     _onCanvasClick(e){
@@ -55,7 +70,7 @@ class TicTacToeProRec extends TicTacToePro{
         this.runNextTurn(x, y, this.currentShape);
     }
 
-    goToSubBoard(x, y, shapeType){
+    goToSubBoard(x, y, shapeType, main){
         if(this.subBoards.length <= x){
             throw `Index x: ${x} out of bounds`;
         }
@@ -66,10 +81,15 @@ class TicTacToeProRec extends TicTacToePro{
         this._removeCanvas();
 
         if(this.subBoards[x][y]){
+            if(main){
+                this.subBoards[x][y].mainBoard = main;
+                main.currentBoard = this.subBoards[x][y];
+            }
             this.subBoards[x][y].draw(this.canvasWidth, this.canvasWidth);
             if(!!shapeType){
                 this.subBoards[x][y].runNextTurn(x, y, shapeType);
             }
+            
         }
     }
 
