@@ -1,18 +1,25 @@
 const path = require('path');
 
+
 module.exports = {
-  entry: path.resolve(__dirname,'tictactoepro.js'),
+  entry: path.resolve(__dirname,'tictactoepro/tictactoepro.js'),
   output: {
-    path: path.resolve(__dirname, 'lib'),
+    path: path.resolve(__dirname, 'dist/tictactoepro'),
     filename: 'index.js'
-  },
+    },
   module: {
-    loaders: [
-      { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
-      { test: /\.jsx$/, loader: 'babel-loader', exclude: /node_modules/ }
-    ],
+    
     rules: [
-      { test: /\.css$/, use: ['style-loader','css-loader'] }
-    ]   
+      {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['env']
+          }
+        }
+      } 
+    ]
   }
 }
