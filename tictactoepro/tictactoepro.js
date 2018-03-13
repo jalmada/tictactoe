@@ -295,3 +295,4 @@
     }
 
     export default TicTacToePro;
+    export {Enums};

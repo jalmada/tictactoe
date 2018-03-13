@@ -11,7 +11,7 @@
   "main": "tictactoepro.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./node_modules/.bin/webpack --config ./webpack.config.js",
+    "build": "./node_modules/.bin/webpack --config ./webpack.config.npm.js",
     "watch": "./node_modules/.bin/webpack --watch",
     "start": "webpack-dev-server"
   },
