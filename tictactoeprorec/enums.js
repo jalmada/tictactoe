@@ -1,4 +1,10 @@
-class Enums {
+import {Enums as TTPEnums} from '../tictactoepro/tictactoepro.js';
+class Enums extends TTPEnums{
+
+    constructor(){
+        super();
+    }
+
     static get DrawMode() {
         return {
             Unknown: 0,
@@ -17,4 +23,4 @@ class Enums {
        }
 }
 
-export default Enums;
+export default Enums

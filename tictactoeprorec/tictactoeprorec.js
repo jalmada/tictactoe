@@ -143,3 +143,4 @@ class TicTacToeProRec extends TicTacToePro{
 }
 
 export default TicTacToeProRec
+export {Enums}
