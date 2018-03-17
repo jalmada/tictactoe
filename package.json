@@ -13,7 +13,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "./node_modules/.bin/webpack --config ./webpack.config.npm.js",
     "watch": "./node_modules/.bin/webpack --watch",
-    "start": "webpack-dev-server"
+    "start": "webpack-dev-server",
+    "buildttt": "./node_modules/.bin/webpack --config ./tictactoepro/webpack.config.js"
   },
   "repository": {
     "type": "git",

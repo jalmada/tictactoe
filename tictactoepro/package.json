@@ -1,0 +1,26 @@
+{
+  "name": "tictactoepro",
+  "version": "2.0.4",
+  "description": "Tic Tac Toe for the masses!",
+  "keywords": [
+    "tictactoe",
+    "gato",
+    "juego",
+    "game"
+  ],
+  "main": "index.js",
+  
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jalmada/tictactoe.git"
+  },
+  "author": "Jose Almada <jalmada.e@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jalmada/tictactoe/issues"
+  },
+  "homepage": "https://github.com/jalmada/tictactoe#readme",
+  "dependencies": {
+    "lodash": "^4.17.3"
+  }
+}
