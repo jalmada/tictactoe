@@ -1,14 +1,18 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
-const HtmlWebpackPluginConfig = new HtmlWebpackPlugin({
-  template: './index.html',
-  filename: 'index.html',
-  inject: 'body'
-})
+const uglify = new UglifyJsPlugin({
+  test: /\.js($|\?)/i,  
+  uglifyOptions: {
+    compress: true,
+    ie8: true,
+    keep_classnames: true,
+    keep_fnames: true,
+  }
+});
 
 module.exports = {
-  entry: path.resolve(__dirname,'index.js'),
+  entry: path.resolve(__dirname,'tictactoepro.js'),
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'index.js'
@@ -29,5 +33,5 @@ module.exports = {
       } 
     ]
   },
-  plugins: [HtmlWebpackPluginConfig]
+  plugins: [uglify]
 }
