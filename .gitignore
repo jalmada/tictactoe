@@ -5,3 +5,4 @@ npm-debug.log
 /final/**
 /lib/**
 package-lock.json
+/tictactoepro/dist/**
