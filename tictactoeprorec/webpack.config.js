@@ -26,7 +26,7 @@ const autoversion = new WebpackAutoInject({
 })
 
 module.exports = {
-  entry: path.resolve(__dirname,'tictactoepro.js'),
+  entry: path.resolve(__dirname,'tictactoeprorec.js'),
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'index.js'
