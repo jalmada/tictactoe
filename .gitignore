@@ -6,3 +6,5 @@ npm-debug.log
 /lib/**
 package-lock.json
 /tictactoepro/dist/**
+/tictactoeprorec/dist/**
+/tictactoeprorec/node_modules/**

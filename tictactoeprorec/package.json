@@ -1,12 +1,13 @@
 {
-    "name": "tictactoepro",
-    "version": "2.0.5",
-    "description": "Tic Tac Toe for the masses!",
+    "name": "tictactoeprorec",
+    "version": "1.0.2",
+    "description": "Tic Tac Toe for the masses (but recursive)!",
     "keywords": [
         "tictactoe",
         "gato",
         "juego",
-        "game"
+        "game",
+        "recursive"
     ],
     "main": "index.js",
     "repository": {
@@ -20,6 +21,6 @@
     },
     "homepage": "https://github.com/jalmada/tictactoe#readme",
     "dependencies": {
-        "lodash": "^4.17.3"
+        "tictactoepro": "^2.0.3"
     }
 }
